@@ -3,7 +3,7 @@ require 'socket'
 require './app.rb'
  
 server = TCPServer.new 5678
- 
+
 loop do
 	Thread.new(server.accept) { |session|
 		#session = server.accept
@@ -19,18 +19,19 @@ loop do
 			'PATH_INFO' => path,
 			'QUERY_STRING' => query
 		})
- 
+
 		session.print "HTTP/1.1 #{status}\r\n"
 		headers.each do |key, value|
 			session.print "#{key}: #{value}\r\n"
 		end
+		session.print "transfer-encoding: chunked\r\n"
 		session.print "\r\n"
 
-		body.getChunks do |chunk|
-			sleep(0.5)
+		body.each do |chunk|
 			puts "#{chunk.length.to_s(16)}\r\n#{chunk}\r\n"
 			session.print "#{chunk.length.to_s(16)}\r\n#{chunk}\r\n"
 		end
+
 		session.print "0\r\n\r\n"
 		session.close
 	}
