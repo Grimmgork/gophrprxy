@@ -1,7 +1,7 @@
 <head>
     <div style="position: sticky;top: 0;background-color: white; margin: 0;">
         <title>gopherspace 🪐</title>
-        <input type="text" value="#url">
+        <input type="text" value="#urlt#">
         <h1 id="path-bar">
         </h1>
         <p>📄 <a id="aroot">server root</a></p>
@@ -20,7 +20,7 @@
         return res;
     }
 
-    url = "#url"
+    url = "#url#"
     purl = new URL(url)
     segments = purl.pathname.split("/").filter(function(s) {
         return s != ""

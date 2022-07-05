@@ -7,8 +7,8 @@ require_relative './mime.rb'
 class Application
 
 	def call(req)
-		segments = req["PATH_INFO"].split("/")
-		segments = segments.select {|e| e != ".." && e != "." && e != "" }
+		segments = req["PATH_INFO"].split("/").select {|e| e != ".." && e != "." && e != "" }
+		method = req["REQUEST_METHOD"]
 		begin 
 			query = CGI::parse(req["QUERY_STRING"])
 		rescue
@@ -16,11 +16,8 @@ class Application
 		end
 
 		#get /static/*
-		if segments[0] == 'static' && req["REQUEST_METHOD"] == 'GET'
-			headers = {
-				"content-type" => MIME_EXT[File.extname(segments[-1])]
-			}
-
+		if segments[0] == 'static' && method == 'GET'
+			headers = {"content-type" => MIME_EXT[File.extname(segments[-1])]}
 			fileName = "./#{segments.join("/")}"
 			if File.file?(fileName)
 				return 200, headers, [File.read(fileName)]
@@ -29,13 +26,13 @@ class Application
 			return 404, {"content-type" => "text/plain"}, ["file not found!"]
 		end
 
-		#get /req?url=URLtype=TYPE
-		if segments[0] == "req" && segments.length == 1 && req["REQUEST_METHOD"] == 'GET'
+		#get /req?url=URL
+		if segments[0] == "req" && segments.length == 1 && method == 'GET'
 
 			if query["url"].nil? || query["url"][0].nil?
-				url = URI("gopher://gopher.floodgap.com") 
+				url = GopherUrl.new("gopher://gopher.floodgap.com") 
 			else
-				url = URI(CGI::unescape(query["url"][0]))
+				url = GopherUrl.new(CGI::unescape(query["url"][0]))
 			end
 			
 			if url.scheme != "gopher"
@@ -43,20 +40,20 @@ class Application
 			end
 
 			headers = { "content-type" => "text/html; charset=utf-8", "X-Content-Type-Options" => "nosniff" }
-			return 200, headers, GopherRequestRender.new(GopherRequest.new(url))
+			return 200, headers, GopherPageRender.new(GopherRequest.new(url))
 		end
 
 		return 404, {"content-type" => "text/plain"}, ["service not found!"]
 	end
 end
 
-class GopherRequestRender
+class GopherPageRender
 	def initialize(req)
 		@req = req
 	end
 
 	def each
-		yield File.read("./static/nav.html", :encoding => 'iso-8859-1').gsub("#url", @req.url.to_s)
+		yield File.read("./static/nav.html", :encoding => 'iso-8859-1').gsub("#url#", @req.url.to_s).gsub("#urlt#", @req.url.to_s(true))
 		@req.request do |row|
 			element = GopherElement.new(row)
 			puts row
@@ -67,7 +64,7 @@ class GopherRequestRender
 	def gopherElementToHtml(element)
 		case element.type
 		when "i"
-			return  element.text.strip == "" ? "<br/>" : "<p>#{element.text}</p>"
+			return  element.text.strip == "" ? "<br/>" : "<pre>#{element.text}</pre>"
 		when "1"
 			return "<p><a href='#{getProxyUrl(element.host, element.port, element.path, "1")}'>#{element.text}</a></p>"
 		when "h"
@@ -78,12 +75,9 @@ class GopherRequestRender
 	end
 
 	def getProxyUrl(host, port, path, type)
-		port = port || 70
-		"/req?url=#{getGopherUrl(host, port, path)}&type=#{type}"
-	end
-
-	def getGopherUrl(host, port, path)
-		"gopher://#{host}:#{port}/#{path}"
+		gurl = GopherUrl.new("gopher://#{host}:#{port}/#{path}")
+		gurl.type = type
+		"/req?url=#{CGI::escape(gurl.to_s(true))}"
 	end
 end
 
@@ -107,6 +101,66 @@ class GopherRequest
 			yield line
 		end
 		s.close
+	end
+end
+
+class GopherUrl 
+  	attr_writer :type
+
+	def initialize(url)
+		@uri = URI(url)
+		@segments = @uri.path.split("/").select{|e| e != ""}
+
+		@type = "."
+
+		if scheme == "gopher"
+			if @segments.length != 0
+				if @segments[0].length == 1
+					@type = @segments[0]
+					@segments = @segments[1..-1]
+				end
+			end
+
+			if port == nil
+				@port = 70
+			end
+		end
+	end
+
+	def type
+		@type
+	end
+
+	def path
+		@segments.join("/")
+	end
+
+	def pathAndQuery
+		"#{path}#{query == nil ? "" : "?#{query}"}"
+	end
+
+	def host
+		@uri.host
+	end
+
+	def port
+		@uri.port || @port
+	end
+
+	def query
+		@uri.query
+	end
+
+	def scheme
+		@uri.scheme
+	end
+
+	def to_s(embedtype = false)
+		if embedtype
+			"#{scheme}://#{host}:#{port}/#{type}/#{pathAndQuery}"
+		else
+			"#{scheme}://#{host}:#{port}/#{pathAndQuery}"
+		end
 	end
 end
 
