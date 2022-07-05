@@ -1,4 +1,4 @@
-# http_server.rb
+# server.rb
 require 'socket'
 require './app.rb'
  
@@ -28,7 +28,7 @@ loop do
 		session.print "\r\n"
 
 		body.each do |chunk|
-			puts "#{chunk.length.to_s(16)}\r\n#{chunk}\r\n"
+			#puts "#{chunk.length.to_s(16)}\r\n#{chunk}\r\n"
 			session.print "#{chunk.length.to_s(16)}\r\n#{chunk}\r\n"
 		end
 

@@ -1,0 +1,49 @@
+<head>
+    <div style="position: sticky;top: 0;background-color: white; margin: 0;">
+        <title>gopherspace 🪐</title>
+        <input type="text" value="#url">
+        <h1 id="path-bar">
+        </h1>
+        <p>📄 <a id="aroot">server root</a></p>
+        <p>👈 <a id="aup">.. </a></p>
+        <hr>
+    </div>
+</head>
+
+<script>
+    function generateurls(segments) {
+        res = [];
+        for (i = 0; i < segments.length; i++) {
+            var gopherurl = `gopher://${segments[0]}/${segments.slice(1, i+1).join("/")}`
+            res.push(`/req?url=${gopherurl}&type=1`);
+        }
+        return res;
+    }
+
+    url = "#url"
+    purl = new URL(url)
+    segments = purl.pathname.split("/").filter(function(s) {
+        return s != ""
+    });
+
+    urls = generateurls(segments);
+
+    document.getElementById("aroot").href = urls[0];
+    if (urls.length > 1)
+        document.getElementById("aup").href = urls[urls.length - 2];
+
+    for (i = 0; i < urls.length; i++) {
+        var hl = document.createElement("a");
+        hl.appendChild(document.createTextNode(segments[i]));
+        hl.href = urls[i];
+        document.getElementById("path-bar").appendChild(hl);
+        document.getElementById("path-bar").appendChild(document.createTextNode(" \\ "));
+    }
+</script>
+
+<style>
+    p {
+        line-height: 18%;
+        font-family: consolas
+    }
+</style>
