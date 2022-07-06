@@ -1,10 +1,12 @@
 <head>
-    <div style="position: sticky;top: 0;background-color: white; margin: 0;">
+    <div class="navbar">
         <title>gopherspace 🪐</title>
         <input type="text" value="#urlt#">
-        <h1 id="path-bar">
-        </h1>
-        <p>📄 <a id="aroot">server root</a></p>
+        <div style="line-height: 100%; font-size: 20;">
+            <p id="path-bar"> </p>
+        </div>
+
+        <p>📄 <a id="aroot">root</a></p>
         <p>👈 <a id="aup">.. </a></p>
         <hr>
     </div>
@@ -37,13 +39,24 @@
         hl.appendChild(document.createTextNode(segments[i]));
         hl.href = urls[i];
         document.getElementById("path-bar").appendChild(hl);
-        document.getElementById("path-bar").appendChild(document.createTextNode(" \\ "));
+        document.getElementById("path-bar").appendChild(document.createTextNode(" / "));
     }
 </script>
 
 <style>
-    p {
+    pre {
         line-height: 18%;
-        font-family: consolas
+        font-family: consolas;
+    }
+    
+    br {
+        line-height: 18%;
+    }
+    
+    .navbar {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        line-height: 30%;
     }
 </style>

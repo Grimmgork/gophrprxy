@@ -26,7 +26,7 @@ class Application
 			return 404, {"content-type" => "text/plain"}, ["file not found!"]
 		end
 
-		#get /req?url=URL
+		#get /req?url=ESCAPED_URL
 		if segments[0] == "req" && segments.length == 1 && method == 'GET'
 
 			if query["url"].nil? || query["url"][0].nil?
@@ -50,14 +50,17 @@ end
 class GopherPageRender
 	def initialize(req)
 		@req = req
+		@unprocessed = ""
 	end
 
 	def each
-		yield File.read("./static/nav.html", :encoding => 'iso-8859-1').gsub("#url#", @req.url.to_s).gsub("#urlt#", @req.url.to_s(true))
-		@req.request do |row|
-			element = GopherElement.new(row)
-			puts row
-			yield gopherElementToHtml(element) + "\r\n"
+		yield File.read("./static/nav.html", :encoding => 'iso-8859-1').gsub("#url#", @req.url.to_s).gsub("#urlt#", @req.url.to_s(true)) + "\r\n\r\n"
+		@req.request do |chunk|
+			extractLines(chunk).each do |row| 
+				element = GopherElement.new(row)
+				puts row
+				yield "<p>#{gopherElementToHtml(element)}</p>\r\n"
+			end
 		end
 	end
 
@@ -65,13 +68,30 @@ class GopherPageRender
 		case element.type
 		when "i"
 			return  element.text.strip == "" ? "<br/>" : "<pre>#{element.text}</pre>"
+		when "0"
+			return "<pre><a href='#{element.url || getProxyUrl(element.host, element.port, element.path, "0")}' target='_blank'>#{element.text}</a></pre>"
 		when "1"
-			return "<p><a href='#{getProxyUrl(element.host, element.port, element.path, "1")}'>#{element.text}</a></p>"
+			return "<pre><a href='#{getProxyUrl(element.host, element.port, element.path, "1")}'>#{element.text}</a></pre>"
 		when "h"
-			return "<p><a href='#{element.url || getProxyUrl(element.host, element.port, element.path, "h")}'>#{element.text}</a></p>"
+			return "<pre><a href='#{element.url || getProxyUrl(element.host, element.port, element.path, "h")}' target='_blank'>#{element.text}</a></pre>"
+		end
+		return "<pre>#{element.text}</pre>"
+	end
+
+	def extractLines(chunk, last=false)
+		@unprocessed += chunk
+		if last
+			return [@unprocessed]
 		end
 
-		return "<p>#{element.text}</p>"
+		res = []
+		while i = @unprocessed.index("\r\n")
+			row = @unprocessed[0..i-1]
+			@unprocessed = @unprocessed[i+2..-1]
+			res.append(row)
+		end
+
+		return res
 	end
 
 	def getProxyUrl(host, port, path, type)
@@ -94,11 +114,11 @@ class GopherRequest
 		s = TCPSocket.new @url.host, @url.port || 70
 		s.write "#{@url.path}\r\n"
 		loop do
-			line = s.gets
-			if line == nil
+			chunk = s.read(255)
+			if chunk == nil
 				break
 			end
-			yield line
+			yield chunk
 		end
 		s.close
 	end
