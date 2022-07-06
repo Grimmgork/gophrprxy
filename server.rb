@@ -8,16 +8,36 @@ loop do
 	Thread.new(server.accept) { |session|
 		#session = server.accept
 		app = Application.new
-		request = session.gets
-		puts request
+		
+		contentLength = 0
+		rows = []
+		loop do 
+			row = session.gets
+			if row == "\r\n"
+				break
+			end
 
-		method, full_path = request.split(' ')
+			row = row[0..-3]
+			if row.start_with?("Content-Length")
+				contentLength = row.split(" ")[1].to_i
+			end
+			rows.append(row)
+		end
+
+		puts rows
+
+		if contentLength != 0
+			content = session.read(contentLength)
+		end
+
+		method, full_path = rows[0].split(' ')
 		path, query = full_path.split('?')
 
 		status, headers, body = app.call({
 			'REQUEST_METHOD' => method,
 			'PATH_INFO' => path,
-			'QUERY_STRING' => query
+			'QUERY_STRING' => query,
+			'CONTENT' => content
 		})
 
 		session.print "HTTP/1.1 #{status}\r\n"

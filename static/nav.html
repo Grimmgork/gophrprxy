@@ -16,8 +16,8 @@
     function generateurls(segments) {
         res = [];
         for (i = 0; i < segments.length; i++) {
-            var gopherurl = `gopher://${segments[0]}/${segments.slice(1, i+1).join("/")}`
-            res.push(`/req?url=${gopherurl}&type=1`);
+            var gopherurl = `gopher://${segments[0]}/1/${segments.slice(1, i+1).join("/")}`
+            res.push(`/req?url=${gopherurl}`);
         }
         return res;
     }
@@ -58,5 +58,13 @@
         top: 0;
         background-color: white;
         line-height: 30%;
+    }
+    
+    body {
+        margin-top: 0px;
+        margin-bottom: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+        padding: 0;
     }
 </style>
