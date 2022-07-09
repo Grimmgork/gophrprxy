@@ -8,7 +8,7 @@ start the server:
 ```
 ruby ./server.rb
 ```
-You can now navigate like so:
+navigate like so:
 ```
 http://localhost:5678/req/[gophertype]/[host]:[port]/[path]
 ```
