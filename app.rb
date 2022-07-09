@@ -7,7 +7,7 @@ require_relative './mime.rb'
 class Application
 
 	def call(req)
-		segments = req["PATH_INFO"].split("/").select {|e| e != ".." && e != "." && e != "" }
+		segments = req["PATH_INFO"].split("/").select {|e| e != ".." && e != "" }
 		method = req["REQUEST_METHOD"]
 		content = req["CONTENT"]
 		begin 
@@ -21,38 +21,32 @@ class Application
 			headers = {"content-type" => MIME_EXT[File.extname(segments[-1])]}
 			fileName = "./#{segments.join("/")}"
 			if File.file?(fileName)
-				return 200, headers, [File.read(fileName)]
+				return 200, headers, [ File.open(fileName, 'rb') { |io| io.read } ]
 			end
 
 			return 404, {"content-type" => "text/plain"}, ["file not found!"]
 		end
 
-		#get /hex/ content => DATATOHEX
-		if segments[0] == "hex" && method == 'GET'
-			if !content
-				return 500, {"content-type" => "text/plain"}, ["no data to hex!"]
-			end
-			return 200, {}, [tohex(content)]
-		end
+		#get /req/./host.host.com/path/path/index.html?kek=lel
+		if segments[0] == 'req' && method == 'GET'
+			segments = segments[1..-1]
 
-		#get /hex/ content => DATATOUNHEX
-		if segments[0] == "unhex" && method == 'GET'
-			if !content
-				return 500, {"content-type" => "text/plain"}, ["no data to hex!"]
+			if segments.length == 0
+				return redirectToDefaultPage()
 			end
-			return 200, {}, [fromhex(content)]
-		end
 
-		#get /req/HEX-URL
-		if segments[0] == "req" && method == 'GET'
-			if segments.length == 2
-				url = GopherUrl.new(fromhex(segments[1]))
-			else
-				return 307, {"Location" => "/req/#{tohex(GopherUrl.new("gopher://gopher.floodgap.com").to_s(true))}"}, [""]
+			if segments[0].length == 1
+				type = segments[0]
+				segments = segments[1..-1]
 			end
-			
-			if url.scheme != "gopher"
-				return 500, {"content-type" => "text/plain"}, ["scheme not supported!"]
+
+			if segments.length == 0
+				return redirectToDefaultPage()
+			end
+
+			url = GopherUrl.new("gopher://#{segments.join("/")}")
+			if type != nil
+				url.type = type
 			end
 
 			if url.type == "1"
@@ -65,44 +59,49 @@ class Application
 
 		return 404, {"content-type" => "text/plain"}, ["service not found!"]
 	end
-end
 
-def tohex(str)
-	str.unpack('H*')[0]
-end
-
-def fromhex(hex)
-	[hex].pack('H*')
+	def redirectToDefaultPage()
+		url = GopherUrl.new("gopher://gopher.floodgap.com")
+		return 307, {"Location" => "/#{url.type}/#{url.host}/#{url.path}"}, [""]
+	end
 end
 
 class GopherPageRender
 	def initialize(req)
 		@req = req
 		@unprocessed = ""
+		@typeIcons = {
+			"0" => "/static/icons/textfile.png",
+			"1" => "/static/icons/folder.png",
+			"h" => "/static/icons/web.png",
+			"I" => "/static/icons/image.png",
+			"g" => "/static/icons/clip.png",
+			"p" => "/static/icons/image.png",
+			"u" => "/static/icons/globe.png"
+		}
 	end
 
 	def each
-		yield File.read("./static/nav.html", :encoding => 'iso-8859-1').gsub("#url#", @req.url.to_s).gsub("#urlt#", @req.url.to_s(true)) + "\r\n\r\n" + "<body>"
+		yield File.read("./static/nav.html", :encoding => 'iso-8859-1').gsub("#url#", @req.url.to_s).gsub("#urlt#", @req.url.to_s(true)) + "\r\n\r\n" + "<body><div id='gopher-page'>"
 		@req.each do |chunk|
 			extractLines(chunk).each do |row| 
 				element = GopherElement.new(row)
 				puts row
-				yield "<p>#{gopherElementToHtml(element)}</p>\r\n"
+				yield "<pre class='gopher-element'><img class='gopher-element-icon' src='#{@typeIcons[element.type] || "/static/icons/blank.png"}'/>#{gopherElementToHtml(element)}</pre>\r\n"
 			end
 		end
-		yield "</body>"
+		yield "</div></body>"
 	end
 
 	def gopherElementToHtml(element)
 		case element.type
 		when "i"
-			return element.text.strip == "" ? "<br/>" : "<pre>#{element.text}</pre>"
+			return element.text.strip == "" ? "<br/>" : element.text
 		when "3"
-			return "<pre>Error: #{element.text}</pre>"
+			return "Error: #{element.text}"
 		else
-			return "<pre><a href='#{element.url || getProxyUrl(element.host, element.port, element.path, element.type)}'>#{element.text}</a></pre>"
+			return "<a href='#{element.url || getProxyUrl(element.host, element.port, element.path, element.type)}'>#{element.text}</a>"
 		end
-		return "<pre>#{element.text}</pre>"
 	end
 
 	def extractLines(chunk, last=false)
@@ -122,9 +121,7 @@ class GopherPageRender
 	end
 
 	def getProxyUrl(host, port, path, type)
-		gurl = GopherUrl.new("gopher://#{host}:#{port}/#{path}")
-		gurl.type = type
-		"/req?url=#{CGI::escape(gurl.to_s(true))}"
+		"/req/#{type}/#{host}:#{port}/#{path}".gsub("#","%23")
 	end
 end
 
@@ -138,6 +135,7 @@ class GopherRequest
 	end
 
 	def each
+		puts "TCPCALL: #{@url.to_s}"
 		s = TCPSocket.new @url.host, @url.port || 70
 		s.write "#{@url.path}\r\n"
 		loop do
@@ -155,8 +153,18 @@ class GopherUrl
   	attr_writer :type
 
 	def initialize(url)
-		@uri = URI(url.gsub(" ", "%20").gsub(">", "%3E").gsub("<", "%3C").gsub("|","%7C"))
-		@segments = CGI::unescape(@uri.path).split("/").select{|e| e != ""}
+		url = CGI::unescape(url)
+
+		@scheme = "gopher"
+		@scheme = url.split("://")[0]
+
+		url = url.split("://")[1]
+
+		hostAndPort = url.split("/")[0]
+		@port = hostAndPort.split(":")[1]
+		@host = hostAndPort.split(":")[0]
+
+		@segments = url.split("/")[1..-1].select{|e| e != ""}
 
 		@type = "."
 
@@ -180,32 +188,24 @@ class GopherUrl
 		@segments.join("/")
 	end
 
-	def pathAndQuery
-		"#{path}#{query == nil ? "" : "?#{query}"}"
-	end
-
 	def host
-		@uri.host
+		@host
 	end
 
 	def port
-		@uri.port
-	end
-
-	def query
-		@uri.query
+		@port
 	end
 
 	def scheme
-		@uri.scheme
+		@scheme
 	end
 
 	def to_s(embedtype = false)
 		portpart = port ? ":#{port}" : ""
 		if embedtype
-			"#{scheme}://#{host}#{portpart}/#{type}/#{pathAndQuery}"
+			"#{scheme}://#{host}#{portpart}/#{type}/#{path}"
 		else
-			"#{scheme}://#{host}#{portpart}/#{pathAndQuery}"
+			"#{scheme}://#{host}#{portpart}/#{path}"
 		end
 	end
 end
@@ -214,6 +214,7 @@ class GopherElement
 
 	def initialize(row)
 		cols = row.split("\t")
+
 		@type = cols[0][0]
 		cols[0] = cols[0][1..-1]
 
@@ -222,10 +223,13 @@ class GopherElement
 
 		if @path == nil
 			@path = ""
+		else
+			@path = @path.strip()
 		end
 
 		if @path.start_with?("URL:")
 			@url = @path[4..-1]
+			@type = "u"
 		else
 			@path = @path.split("/").select {|s| s != ""}.join("/")
 		end
