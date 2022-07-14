@@ -62,7 +62,7 @@ class Application
 
 	def redirectToDefaultPage()
 		url = GopherUrl.new("gopher://gopher.floodgap.com")
-		return 307, {"Location" => "/#{url.type}/#{url.host}/#{url.path}"}, [""]
+		return 307, {"Location" => "/req/#{url.type}/#{url.host}/#{url.path}"}, [""]
 	end
 end
 
@@ -70,7 +70,10 @@ class GopherPageRender
 	def initialize(req)
 		@req = req
 		@unprocessed = ""
-		@typeIcons = {
+	end
+
+	def getIconForType(type)
+		typeIcons = {
 			"0" => "/static/icons/textfile.png",
 			"1" => "/static/icons/folder.png",
 			"h" => "/static/icons/web.png",
@@ -78,8 +81,10 @@ class GopherPageRender
 			"g" => "/static/icons/clip.png",
 			"p" => "/static/icons/image.png",
 			"u" => "/static/icons/globe.png",
-			"7" => "/static/icons/gears.png"
+			"7" => "/static/icons/gears.png",
+			"2" => "/static/icons/questionmark.png",
 		}
+		return typeIcons[type]
 	end
 
 	def each
@@ -89,10 +94,13 @@ class GopherPageRender
 		end
 		yield "<body><div id='gopher-page'>\r\n"
 		@req.each do |chunk|
-			extractLines(chunk).each do |row| 
+			extractLines(chunk).each do |row|
+				if row == "."
+					break
+				end
 				element = GopherElement.new(row)
 				puts row
-				yield "<pre class='gopher-element'><img class='gopher-element-icon' src='#{@typeIcons[element.type] || "/static/icons/blank.png"}'/>#{gopherElementToHtml(element)}</pre>\r\n"
+				yield "<pre class='gopher-element'><img class='gopher-element-icon' src='#{getIconForType(element.type) || "/static/icons/blank.png"}'/>#{gopherElementToHtml(element)}</pre>\r\n"
 			end
 		end
 		yield "</div></body>"
@@ -100,7 +108,7 @@ class GopherPageRender
 
 	def gopherElementToHtml(element)
 		case element.type
-		when "i"
+		when "i", "2"
 			return element.text.strip == "" ? "<br/>" : element.text
 		when "3"
 			return "Error: #{element.text}"
