@@ -1,4 +1,4 @@
-# A Personal Gopher Proxy 📂
+# A minimalistic Personal Gopher Proxy 📂
 Written in Ruby ...
 
 Icons by https://win98icons.alexmeub.com/
@@ -12,6 +12,8 @@ navigate like so:
 ```
 http://localhost:5678/req/[gophertype]/[host]:[port]/[path]
 ```
+
+When type is unknown, just omit the type segment or use a dot .
 
 
 ## Default gopher: app

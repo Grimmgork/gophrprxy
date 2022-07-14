@@ -6,7 +6,6 @@ server = TCPServer.new 5678
 
 loop do
 	Thread.new(server.accept) { |session|
-		#session = server.accept
 		app = Application.new
 		
 		contentLength = 0
@@ -48,7 +47,6 @@ loop do
 		session.print "\r\n"
 
 		body.each do |chunk|
-			#puts "#{chunk.length.to_s(16)}\r\n#{chunk}\r\n"
 			session.print "#{chunk.length.to_s(16)}\r\n#{chunk}\r\n"
 		end
 

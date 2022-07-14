@@ -32,7 +32,7 @@ class Application
 			segments = segments[1..-1]
 
 			if segments.length == 0
-				return redirectToDefaultPage()
+				return redirectToDefaultPage()	
 			end
 
 			if segments[0].length == 1
@@ -49,7 +49,7 @@ class Application
 				url.type = type
 			end
 
-			if url.type == "1"
+			if url.type == "1" || url.type == "7"
 				headers = { "content-type" => "text/html; charset=utf-8", "X-Content-Type-Options" => "nosniff" }
 				return 200, headers, GopherPageRender.new(GopherRequest.new(url))
 			end
@@ -77,12 +77,17 @@ class GopherPageRender
 			"I" => "/static/icons/image.png",
 			"g" => "/static/icons/clip.png",
 			"p" => "/static/icons/image.png",
-			"u" => "/static/icons/globe.png"
+			"u" => "/static/icons/globe.png",
+			"7" => "/static/icons/gears.png"
 		}
 	end
 
 	def each
-		yield File.read("./static/nav.html", :encoding => 'iso-8859-1').gsub("#url#", @req.url.to_s).gsub("#urlt#", @req.url.to_s(true)) + "\r\n\r\n" + "<body><div id='gopher-page'>"
+		yield File.read("./static/nav.html", :encoding => 'iso-8859-1').gsub("#url#", @req.url.to_s).gsub("#urlt#", @req.url.to_s(true))
+		if @req.url.type == "7"
+			yield "<script src='/static/query.js'></script>\r\n"
+		end
+		yield "<body><div id='gopher-page'>\r\n"
 		@req.each do |chunk|
 			extractLines(chunk).each do |row| 
 				element = GopherElement.new(row)
@@ -198,6 +203,10 @@ class GopherUrl
 
 	def scheme
 		@scheme
+	end
+
+	def query
+		@query
 	end
 
 	def to_s(embedtype = false)

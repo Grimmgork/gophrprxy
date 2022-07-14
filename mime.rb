@@ -562,5 +562,6 @@ MIME_EXT = {
 MIME_GOPHER_TYPE = {
 	"0" => "text/plain",
 	"g" => "image/gif",
+	"p" => "image/png",
 	"I" => "image"
 }
