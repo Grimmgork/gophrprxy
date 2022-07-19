@@ -30,13 +30,11 @@ loop do
 		end
 
 		method, full_path = rows[0].split(' ')
-		path, query = full_path.split('?')
 
 		begin
 			status, headers, body = app.call({
 				'REQUEST_METHOD' => method,
-				'PATH_INFO' => path,
-				'QUERY_STRING' => query,
+				'PATH_INFO' => full_path,
 				'CONTENT' => content
 			})
 			rescue

@@ -79,7 +79,8 @@ class GopherPageRender
 			"u" => "globe.png",
 			"7" => "gears.png",
 			"9" => "binary.png",
-			"3" => "error.png"
+			"3" => "error.png",
+			"d" => "document.png"
 		}
 
 		res = typeIcons[type]
@@ -94,7 +95,7 @@ class GopherPageRender
 		if @req.url.type == "7"
 			yield "<script src='/static/query.js'></script>\r\n"
 		end
-		yield "<body><div id='gopher-page'>\r\n"
+		yield "<div id='gopher-page'>\r\n"
 		@req.each do |chunk|
 			extractLines(chunk).each do |row|
 				if row == "."
@@ -105,7 +106,7 @@ class GopherPageRender
 				yield "<pre class='gopher-element'><img class='gopher-element-icon' src='/static/icons/#{getIconForType(element.type)}'/>#{gopherElementToInline(element)}</pre>\r\n"
 			end
 		end
-		yield "</div></body>"
+		yield "</div>"
 	end
 
 	def gopherElementToInline(element)
