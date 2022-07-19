@@ -1,6 +1,6 @@
 <head>
     <title>gopherspace 🪐</title>
-    <div style="padding: 10;" id="navbar">
+    <div style="padding-top: 10; padding-left: 20; padding-bottom: 10;" id="navbar">
         <p id="path-bar"><img src="/static/icons/computer.png" width="18" style="vertical-align:middle;" /> </p>
         <p>👈 <a id="aup">.. </a></p>
     </div>
@@ -36,6 +36,11 @@
 </script>
 
 <style>
+
+	:root {
+  		--color-error: #ff4444;
+	}
+
     br {
         line-height: 0%;
     }
@@ -69,20 +74,29 @@
         margin-left: 0px;
         margin-right: 0px;
         padding: 0;
-        color: lightgray;
-        background-color: black;
+        background-color: rgb(10, 10, 11);
     }
     
     #gopher-page {
-        margin-left: 25px;
+        margin-left: 20;
         margin-top: 20;
+	   margin-bottom: 20;
     }
     
     .gopher-element {
         font-family: monospace;
+	   color: rgb(201, 201, 201);
         margin: 0;
         padding: 0;
-        height: 20px;
+	   height: 18;
+    }
+
+    .gopher-element-error {
+	   color: #ff4444;
+    }
+
+    .gopher-element-unknown {
+	   color: white;
     }
     
     .gopher-element-icon {

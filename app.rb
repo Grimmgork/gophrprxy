@@ -10,11 +10,6 @@ class Application
 		segments = req["PATH_INFO"].split("/").select {|e| e != ".." && e != "" }
 		method = req["REQUEST_METHOD"]
 		content = req["CONTENT"]
-		begin 
-			query = CGI::parse(req["QUERY_STRING"])
-		rescue
-			query = {}
-		end
 
 		#get /static/*
 		if segments[0] == 'static' && method == 'GET'
@@ -32,7 +27,7 @@ class Application
 			segments = segments[1..-1]
 
 			if segments.length == 0
-				return redirectToDefaultPage()	
+				return redirectToDefaultPage()
 			end
 
 			if segments[0].length == 1
@@ -74,17 +69,24 @@ class GopherPageRender
 
 	def getIconForType(type)
 		typeIcons = {
-			"0" => "/static/icons/textfile.png",
-			"1" => "/static/icons/folder.png",
-			"h" => "/static/icons/web.png",
-			"I" => "/static/icons/image.png",
-			"g" => "/static/icons/clip.png",
-			"p" => "/static/icons/image.png",
-			"u" => "/static/icons/globe.png",
-			"7" => "/static/icons/gears.png",
-			"2" => "/static/icons/questionmark.png",
+			"i" => "blank.png",
+			"0" => "textfile.png",
+			"1" => "folder.png",
+			"h" => "web.png",
+			"I" => "image.png",
+			"g" => "clip.png",
+			"p" => "image.png",
+			"u" => "globe.png",
+			"7" => "gears.png",
+			"9" => "binary.png",
+			"3" => "error.png"
 		}
-		return typeIcons[type]
+
+		res = typeIcons[type]
+		if res == nil
+			return  "questionmark.png"
+		end
+		return res
 	end
 
 	def each
@@ -100,18 +102,18 @@ class GopherPageRender
 				end
 				element = GopherElement.new(row)
 				puts row
-				yield "<pre class='gopher-element'><img class='gopher-element-icon' src='#{getIconForType(element.type) || "/static/icons/blank.png"}'/>#{gopherElementToHtml(element)}</pre>\r\n"
+				yield "<pre class='gopher-element'><img class='gopher-element-icon' src='/static/icons/#{getIconForType(element.type)}'/>#{gopherElementToInline(element)}</pre>\r\n"
 			end
 		end
 		yield "</div></body>"
 	end
 
-	def gopherElementToHtml(element)
+	def gopherElementToInline(element)
 		case element.type
 		when "i", "2"
-			return element.text.strip == "" ? "<br/>" : element.text
+			return element.text == "" ? "<br/>" : element.text
 		when "3"
-			return "Error: #{element.text}"
+			return element.text == "" ? "<br/>" : "<span style='color:var(--color-error)'>#{element.text}</span>"
 		else
 			return "<a href='#{element.url || getProxyUrl(element.host, element.port, element.path, element.type)}'>#{element.text}</a>"
 		end
@@ -150,7 +152,7 @@ class GopherRequest
 	def each
 		puts "TCPCALL: #{@url.to_s}"
 		s = TCPSocket.new @url.host, @url.port || 70
-		s.write "#{@url.path}\r\n"
+		s.write "#{@url.pathAndQuery}\r\n"
 		loop do
 			chunk = s.read(255)
 			if chunk == nil
@@ -168,21 +170,23 @@ class GopherUrl
 	def initialize(url)
 		url = CGI::unescape(url)
 
-		@scheme = "gopher"
-		@scheme = url.split("://")[0]
+		@scheme, url = url.split("://")
 
-		url = url.split("://")[1]
+		hostAndPort = url.split("/",2)[0]
+		@host, @port = hostAndPort.split(":",2)
+		@host = @host.strip()
 
-		hostAndPort = url.split("/")[0]
-		@port = hostAndPort.split(":")[1]
-		@host = hostAndPort.split(":")[0]
+		@segments = []
 
-		@segments = url.split("/")[1..-1].select{|e| e != ""}
+		path = url.split("/",2)[1]
+		if path 
+			@segments = path.split("/").select{|e| e.strip() != ""}
+			@query = @segments[-1].split("?")[1]
+		end
 
 		@type = "."
-
 		if scheme == "gopher"
-			if @segments.length != 0
+			if path && @segments.length != 0
 				if @segments[0].length == 1
 					@type = @segments[0]
 					@segments = @segments[1..-1]
@@ -198,7 +202,11 @@ class GopherUrl
 	end
 
 	def path
-		@segments.join("/")
+		"/#{@segments.join("/")}"
+	end
+
+	def pathAndQuery
+		path + (query ? "?#{query}" : "")
 	end
 
 	def host
@@ -220,9 +228,9 @@ class GopherUrl
 	def to_s(embedtype = false)
 		portpart = port ? ":#{port}" : ""
 		if embedtype
-			"#{scheme}://#{host}#{portpart}/#{type}/#{path}"
+			"#{scheme}://#{host}#{portpart}/#{type}#{pathAndQuery}"
 		else
-			"#{scheme}://#{host}#{portpart}/#{path}"
+			"#{scheme}://#{host}#{portpart}#{pathAndQuery}"
 		end
 	end
 end
@@ -240,15 +248,15 @@ class GopherElement
 
 		if @path == nil
 			@path = ""
-		else
-			@path = @path.strip()
 		end
+			
+		@path = @path.strip()
 
 		if @path.start_with?("URL:")
 			@url = @path[4..-1]
 			@type = "u"
 		else
-			@path = @path.split("/").select {|s| s != ""}.join("/")
+			@path = @path.split("/").select {|s| s.strip() != ""}.join("/")
 		end
 
 		@host = cols[2]

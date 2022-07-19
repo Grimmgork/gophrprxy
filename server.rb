@@ -32,12 +32,18 @@ loop do
 		method, full_path = rows[0].split(' ')
 		path, query = full_path.split('?')
 
-		status, headers, body = app.call({
-			'REQUEST_METHOD' => method,
-			'PATH_INFO' => path,
-			'QUERY_STRING' => query,
-			'CONTENT' => content
-		})
+		begin
+			status, headers, body = app.call({
+				'REQUEST_METHOD' => method,
+				'PATH_INFO' => path,
+				'QUERY_STRING' => query,
+				'CONTENT' => content
+			})
+			rescue
+			status = 500
+			headers = {"content-type" => "text/plain"}
+			body = ["Internal error!"]
+		end
 
 		session.print "HTTP/1.1 #{status}\r\n"
 		headers.each do |key, value|
