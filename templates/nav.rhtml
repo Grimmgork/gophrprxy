@@ -1,0 +1,15 @@
+<div class="navbar">
+	<style>
+		p{
+			margin-top: 0px;
+			margin-bottom: 10px;
+		}
+	</style>
+	<p><img src="/static/icons/computer.png" width="18" style="vertical-align:middle;" />
+		<% segments, urls = url_segments %>
+		<% segments.each_with_index do |seg, index| %>
+			<a href="<%=h(urls[index])%>"><%=h(seg)%></a> /
+		<% end %>
+	</p>
+	<p>👈 <a id="aup">.. </a></p>
+</div>

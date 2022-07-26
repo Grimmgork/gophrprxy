@@ -1,11 +1,12 @@
 require 'socket'
 require 'uri'
 require 'cgi'
+require 'erb'
 
+require_relative './templ.rb'
 require_relative './mime.rb'
 
 class Application
-
 	def call(req)
 		segments = req["PATH_INFO"].split("/").select {|e| e != ".." && e != "" }
 		method = req["REQUEST_METHOD"]
@@ -18,7 +19,6 @@ class Application
 			if File.file?(fileName)
 				return 200, headers, [ File.open(fileName, 'rb') { |io| io.read } ]
 			end
-
 			return 404, {"content-type" => "text/plain"}, ["file not found!"]
 		end
 
@@ -56,12 +56,18 @@ class Application
 	end
 
 	def redirectToDefaultPage()
-		url = GopherUrl.new("gopher://gopher.floodgap.com")
-		return 307, {"Location" => "/req/#{url.type}/#{url.host}/#{url.path}"}, [""]
+		gurl = GopherUrl.new("gopher://gopher.floodgap.com")
+		return 307, {"Location" => GetProxyPath(gurl)}, [""]
+	end
+
+	def self.GetProxyPath(gopherurl)
+		"/req/#{gopherurl.type}/#{gopherurl.host}#{gopherurl.path}"
 	end
 end
 
 class GopherPageRender
+	include Templ
+
 	def initialize(req)
 		@req = req
 		@unprocessed = ""
@@ -91,34 +97,19 @@ class GopherPageRender
 	end
 
 	def each
-		yield File.read("./static/nav.html", :encoding => 'iso-8859-1').gsub("#url#", @req.url.to_s).gsub("#urlt#", @req.url.to_s(true))
-		if @req.url.type == "7"
-			yield "<script src='/static/query.js'></script>\r\n"
-		end
-		yield "<div id='gopher-page'>\r\n"
+		yield "<!DOCTYPE html><html><head><link rel=\"stylesheet\" href=\"/static/style.css\" /></head><body>#{Render("nav.rhtml")}<div class='gopher-page'>"
 		@req.each do |chunk|
 			extractLines(chunk).each do |row|
 				if row == "."
 					break
 				end
 				element = GopherElement.new(row)
-				puts row
-				yield "<pre class='gopher-element'><img class='gopher-element-icon' src='/static/icons/#{getIconForType(element.type)}'/>#{gopherElementToInline(element)}</pre>\r\n"
+				yield element.Render("gopherelement.rhtml")
 			end
 		end
-		yield "</div>"
-	end
+		yield "</div></body></html>"
+ 	end
 
-	def gopherElementToInline(element)
-		case element.type
-		when "i", "2"
-			return element.text == "" ? "<br/>" : element.text
-		when "3"
-			return element.text == "" ? "<br/>" : "<span style='color:var(--color-error)'>#{element.text}</span>"
-		else
-			return "<a href='#{element.url || getProxyUrl(element.host, element.port, element.path, element.type)}'>#{element.text}</a>"
-		end
-	end
 
 	def extractLines(chunk, last=false)
 		@unprocessed += chunk
@@ -136,8 +127,21 @@ class GopherPageRender
 		return res
 	end
 
-	def getProxyUrl(host, port, path, type)
-		"/req/#{type}/#{host}:#{port}/#{path}".gsub("#","%23")
+	def url_segments
+		segments = [@req.url.host_and_port] + @req.url.segments
+		
+		urls = []
+		gurl = GopherUrl.new("gopher://#{segments[0]}")
+
+		puts gurl.path
+
+		urls.append Application.GetProxyPath(gurl)
+		segments[1..-1].each do |seg, index|
+			gurl.segments.append(seg)
+			urls.append Application.GetProxyPath(gurl)
+		end
+		
+		return segments, urls
 	end
 end
 
@@ -218,6 +222,10 @@ class GopherUrl
 		@port
 	end
 
+	def host_and_port
+		host + (port ? ":#{port}" : "")
+	end
+
 	def scheme
 		@scheme
 	end
@@ -226,17 +234,21 @@ class GopherUrl
 		@query
 	end
 
+	def segments
+		@segments
+	end
+
 	def to_s(embedtype = false)
-		portpart = port ? ":#{port}" : ""
 		if embedtype
-			"#{scheme}://#{host}#{portpart}/#{type}#{pathAndQuery}"
+			"#{scheme}://#{host_and_port}/#{type}#{pathAndQuery}"
 		else
-			"#{scheme}://#{host}#{portpart}#{pathAndQuery}"
+			"#{scheme}://#{host_and_port}#{pathAndQuery}"
 		end
 	end
 end
 
 class GopherElement
+	include Templ
 
 	def initialize(row)
 		cols = row.split("\t")
@@ -288,11 +300,7 @@ class GopherElement
 		@url
 	end
 
-	def to_s
-		puts "type: #{@type}"
-		puts "text: #{@text}"
-		puts "path: #{@path}"
-		puts "host: #{@host}"
-		puts "port: #{@port}"
+	def get_binding
+		binding
 	end
 end

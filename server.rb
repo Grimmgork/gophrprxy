@@ -31,17 +31,17 @@ loop do
 
 		method, full_path = rows[0].split(' ')
 
-		begin
+		#begin
 			status, headers, body = app.call({
 				'REQUEST_METHOD' => method,
 				'PATH_INFO' => full_path,
 				'CONTENT' => content
 			})
-			rescue
-			status = 500
-			headers = {"content-type" => "text/plain"}
-			body = ["Internal error!"]
-		end
+			#rescue
+			#status = 500
+			#headers = {"content-type" => "text/plain"}
+			#body = ["Internal error!"]
+		#end
 
 		session.print "HTTP/1.1 #{status}\r\n"
 		headers.each do |key, value|
@@ -51,7 +51,12 @@ loop do
 		session.print "\r\n"
 
 		body.each do |chunk|
-			session.print "#{chunk.length.to_s(16)}\r\n#{chunk}\r\n"
+			#puts chunk.class
+			if chunk
+				session.print "#{chunk.bytesize.to_s(16)}\r\n#{chunk}\r\n"
+			else
+				puts "\r\nattempted to send NIL???\r\n"
+			end
 		end
 
 		session.print "0\r\n\r\n"

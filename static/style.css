@@ -1,0 +1,78 @@
+
+br {
+   line-height: 0%;
+}
+    
+a:link {
+	color: rgb(4, 12, 255);
+     background-color: transparent;
+     text-decoration: none;
+}
+    
+a:hover {
+   background-color: rgba(0, 13, 255, 0.185);
+}
+    
+a:visited {
+	color: rgb(84, 4, 255);
+	background-color: transparent;
+}
+    
+    body {
+        margin-top: 0px;
+        margin-bottom: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+	   padding-top: 0;
+        background-color: rgb(10, 10, 11);
+    }
+    
+    div.gopher-page {
+        margin-left: 20px;
+        margin-top: 20px;
+	   margin-bottom: 20px;
+    }
+    
+    .gopher-element {
+        font-family: monospace;
+	   color: rgb(201, 201, 201);
+        margin: 0;
+        padding: 0;
+	   height: 18;
+    }
+
+    .gopher-element-error {
+	   color: #ff4444;
+    }
+
+    .gopher-element-unknown {
+	   color: white;
+    }
+    
+    .gopher-element-icon {
+        vertical-align: middle;
+        object-fit: contain;
+        width: 15px;
+        height: 15px;
+     margin-right: 5px;
+}
+
+div.navbar {
+	padding-top: 10px;
+	padding-left: 10px;
+	padding-bottom: 10px;
+	position: sticky;
+	top: 0;
+	color: whitesmoke;
+	background-color: rgb(18, 19, 20);
+	line-height: 100%;
+	font-family: monospace;
+}
+    
+pre {
+     padding: 0px;
+     margin-top: 0px;
+     margin-bottom: 0px;
+     padding-top: 0px;
+	padding-bottom: 0px;
+}
