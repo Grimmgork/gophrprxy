@@ -12,4 +12,21 @@
 		<% end %>
 	</p>
 	<p>👈 <a id="aup">.. </a></p>
+
+	<% if @req.url.type == "7" %>
+	<div class="query-module">
+    		<img src="/static/icons/gears.png" width="20" style="vertical-align: middle;" />
+    		<input type="text" id="query-input" placeholder="query" />
+    		<button type="button" onclick="RunQuery(document.getElementById('query-input').value)">run</button>
+	</div>
+	<script>
+		let person = prompt("Please enter your name", "Harry Potter");
+		query = "<%=@req.url.query%>"
+		baseurl = "<%=@req.url.to_s_without_query%>"
+		function RunQuery(query) {
+    			baseurl + "?" + query;
+		}
+		document.getElementById('query-input').value = query
+	</script>
+	<% end %>
 </div>

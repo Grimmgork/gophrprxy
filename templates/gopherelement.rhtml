@@ -1,3 +1,17 @@
 <pre class='gopher-element'>
-<img class='gopher-element-icon' src='/static/icons/binary.png'/><%=h(text)%>
-</pre>
+<% case @element.type 
+when "i" %><img class='gopher-element-icon' src='/static/icons/blank.png'/><%=h(@element.text)%>
+<% when "0" %><img class='gopher-element-icon' src='/static/icons/textfile.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% when "1" %><img class='gopher-element-icon' src='/static/icons/folder.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% when "h" %><img class='gopher-element-icon' src='/static/icons/web.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% when "I" %><img class='gopher-element-icon' src='/static/icons/image.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% when "g" %><img class='gopher-element-icon' src='/static/icons/clip.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% when "P" %><img class='gopher-element-icon' src='/static/icons/image.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% when "u" %><img class='gopher-element-icon' src='/static/icons/globe.png'/><a href="<%=h(@element.url)%>"><%=h(@element.text)%></a>
+<% when "7" %><img class='gopher-element-icon' src='/static/icons/gears.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% when "9" %><img class='gopher-element-icon' src='/static/icons/binary.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% when "9" %><img class='gopher-element-icon' src='/static/icons/binary.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% when "3" %><img class='gopher-element-icon' src='/static/icons/error.png'/><%=h(text)%>
+<% when "d" %><img class='gopher-element-icon' src='/static/icons/document.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% else %><img class='gopher-element-icon' src='/static/icons/questionmark.png'/><a href="<%=h(full_url)%>"><%=h(@element.text)%></a>
+<% end %></pre>

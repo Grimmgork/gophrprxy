@@ -73,38 +73,15 @@ class GopherPageRender
 		@unprocessed = ""
 	end
 
-	def getIconForType(type)
-		typeIcons = {
-			"i" => "blank.png",
-			"0" => "textfile.png",
-			"1" => "folder.png",
-			"h" => "web.png",
-			"I" => "image.png",
-			"g" => "clip.png",
-			"p" => "image.png",
-			"u" => "globe.png",
-			"7" => "gears.png",
-			"9" => "binary.png",
-			"3" => "error.png",
-			"d" => "document.png"
-		}
-
-		res = typeIcons[type]
-		if res == nil
-			return  "questionmark.png"
-		end
-		return res
-	end
-
 	def each
 		yield "<!DOCTYPE html><html><head><link rel=\"stylesheet\" href=\"/static/style.css\" /></head><body>#{Render("nav.rhtml")}<div class='gopher-page'>"
 		@req.each do |chunk|
 			extractLines(chunk).each do |row|
-				if row == "."
+				if row.strip() == "."
 					break
 				end
 				element = GopherElement.new(row)
-				yield element.Render("gopherelement.rhtml")
+				yield GopherElementRender.new(element).Render("gopherelement.rhtml")
 			end
 		end
 		yield "</div></body></html>"
@@ -163,6 +140,7 @@ class GopherRequest
 			if chunk == nil
 				break
 			end
+			puts chunk
 			yield chunk
 		end
 		s.close
@@ -171,6 +149,7 @@ end
 
 class GopherUrl 
   	attr_writer :type
+	attr_writer :query
 
 	def initialize(url)
 		url = CGI::unescape(url)
@@ -186,7 +165,9 @@ class GopherUrl
 		path = url.split("/",2)[1]
 		if path 
 			@segments = path.split("/").select{|e| e.strip() != ""}
-			@query = @segments[-1].split("?")[1]
+			if segments.length != 0
+				@query = @segments[-1].split("?")[1]
+			end
 		end
 
 		@type = "."
@@ -245,11 +226,13 @@ class GopherUrl
 			"#{scheme}://#{host_and_port}#{pathAndQuery}"
 		end
 	end
+
+	def to_s_without_query()
+		"#{scheme}://#{host_and_port}#{path}"
+	end
 end
 
 class GopherElement
-	include Templ
-
 	def initialize(row)
 		cols = row.split("\t")
 
@@ -302,5 +285,18 @@ class GopherElement
 
 	def get_binding
 		binding
+	end
+end
+
+class GopherElementRender
+	include Templ
+
+	def initialize(element)
+		@element = element
+	end
+
+	def full_url
+		url = "gopher://#{@element.host}:#{@element.port}/#{@element.type}/#{@element.path}"
+		Application.GetProxyPath(GopherUrl.new(url))
 	end
 end
