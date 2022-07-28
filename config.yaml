@@ -1,6 +1,3 @@
 ---
 port: 5678
 home: gopher://gopher.floodgap.com
-host: localhost
-bookmarks:
-  - gopher://gopher.floodgap.com

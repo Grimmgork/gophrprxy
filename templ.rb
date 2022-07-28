@@ -1,7 +1,8 @@
-module Templ
+class Templ
 	include ERB::Util
+
 	def Render(templatename)
-		content = File.read("./templates/#{templatename}")
+		content = File.read("./templates/#{self.class::TEMPLATENAME}")
 		return ERB.new(content).result(binding)
 	end
 

@@ -12,6 +12,10 @@ class Application
 		method = req["REQUEST_METHOD"]
 		content = req["CONTENT"]
 
+		if segments.length == 0
+			return redirectToDefaultPage()
+		end
+
 		#get /static/*
 		if segments[0] == 'static' && method == 'GET'
 			headers = {"content-type" => MIME_EXT[File.extname(segments[-1])]}
@@ -57,7 +61,7 @@ class Application
 
 	def redirectToDefaultPage()
 		gurl = GopherUrl.new("gopher://gopher.floodgap.com")
-		return 307, {"Location" => GetProxyPath(gurl)}, [""]
+		return 307, {"Location" => Application.GetProxyPath(gurl)}, [""]
 	end
 
 	def self.GetProxyPath(gopherurl)
@@ -65,8 +69,9 @@ class Application
 	end
 end
 
-class GopherPageRender
-	include Templ
+class GopherPageRender < Templ
+	#include Templ
+	TEMPLATENAME = "nav.rhtml"
 
 	def initialize(req)
 		@req = req
@@ -303,8 +308,8 @@ class GopherElement
 	end
 end
 
-class GopherElementRender
-	include Templ
+class GopherElementRender < Templ
+	TEMPLATENAME = "gopherelement.rhtml"
 
 	def initialize(element)
 		@element = element
