@@ -2,8 +2,11 @@
 require 'socket'
 require 'yaml'
 require './app.rb'
- 
-PORT = 5678
+
+config = YAML.load_file('config.yml')
+
+PORT = config["port"].to_i
+HOME = config["home"]
 
 puts " __ _ ___ _ __| |_  _ _ _____ ___  _ "
 puts "/ _` / _ \\ '_ \\ ' \\| '_/ _ \\ \\ / || |"
@@ -15,8 +18,8 @@ server = TCPServer.new PORT
 
 puts "Server started at port #{PORT}!"
 puts
-puts "navigate:"
-puts "http://localhost:#{PORT}#{Application.GetProxyPath(GopherUrl.new("gopher://gopher.floodgap.com"))}"
+puts "home:"
+puts "http://localhost:#{PORT}#{Application.GetProxyPath(GopherUrl.new(HOME))}"
 
 loop do
 	Thread.new(server.accept) { |session|
