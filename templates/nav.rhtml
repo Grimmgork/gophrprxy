@@ -11,7 +11,7 @@
 			<a href="<%=h(urls[index])%>"><%=h(seg)%></a> /
 		<% end %>
 	</p>
-	<p>👈 <a id="aup">.. </a></p>
+	<p>👈 <a id="aup" href="<%=h(one_up)%>">..</a></p>
 
 	<% if @req.url.type == "7" %>
 	<div class="query-module">
@@ -20,9 +20,9 @@
     		<button type="button" onclick="RunQuery(document.getElementById('query-input').value)">run</button>
 	</div>
 	<script>
-		let person = prompt("Please enter your name", "Harry Potter");
+		//let person = prompt("query?", "Harry Potter");
 		query = "<%=@req.url.query%>"
-		baseurl = "<%=@req.url.to_s_without_query%>"
+		baseurl = "<%=@req.url.without_query%>"
 		function RunQuery(query) {
     			baseurl + "?" + query;
 		}

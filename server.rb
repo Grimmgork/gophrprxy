@@ -2,7 +2,22 @@
 require 'socket'
 require './app.rb'
  
-server = TCPServer.new 5678
+PORT = 5678
+HOST = "trinitron"
+
+
+puts " __ _ ___ _ __| |_  _ _ _____ ___  _ "
+puts "/ _` / _ \\ '_ \\ ' \\| '_/ _ \\ \\ / || |"
+puts "\\__, \\___/ .__/_||_|_| \\___/_\\_\\\\_, |"
+puts "|___/    |_|                    |__/ "
+puts
+
+server = TCPServer.new PORT
+
+puts "Server started at port #{PORT}!"
+puts
+puts "navigate:"
+puts "http://#{HOST}:#{PORT}#{Application.GetProxyPath(GopherUrl.new("gopher://gopher.floodgap.com"))}"
 
 loop do
 	Thread.new(server.accept) { |session|
@@ -12,7 +27,7 @@ loop do
 		rows = []
 		loop do 
 			row = session.gets
-			if row == "\r\n"
+			if row == "\r\n" || !row
 				break
 			end
 

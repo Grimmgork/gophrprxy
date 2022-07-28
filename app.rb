@@ -120,6 +120,14 @@ class GopherPageRender
 		
 		return segments, urls
 	end
+
+	def query_segment
+		@req.url.query
+	end
+
+	def one_up
+		Application.GetProxyPath(GopherUrl.new(@req.url.one_up))
+	end
 end
 
 class GopherRequest
@@ -165,8 +173,11 @@ class GopherUrl
 		path = url.split("/",2)[1]
 		if path 
 			@segments = path.split("/").select{|e| e.strip() != ""}
-			if segments.length != 0
-				@query = @segments[-1].split("?")[1]
+			if segments.length > 0
+				@query = @segments[-1].split("?", 1)[1]
+				if @query
+					@segments[-1] = @segments[-1][0..@query.length-1]
+				end
 			end
 		end
 
@@ -187,8 +198,8 @@ class GopherUrl
 		@type
 	end
 
-	def path
-		"/#{@segments.join("/")}"
+	def path(upto = -1)
+		"/#{@segments[0..upto].join("/")}"
 	end
 
 	def pathAndQuery
@@ -227,8 +238,12 @@ class GopherUrl
 		end
 	end
 
-	def to_s_without_query()
+	def without_query()
 		"#{scheme}://#{host_and_port}#{path}"
+	end
+
+	def one_up()
+		"#{scheme}://#{host_and_port}/#{type}#{path(-2)}"
 	end
 end
 
