@@ -10,7 +10,7 @@ ruby ./server.rb
 ```
 navigate like so:
 ```
-http://localhost:5678/req/[gophertype]/[host]:[port]/[path]
+http://localhost:5678/req/[GOPHERTYPE]/[HOST]:[PORT]/[PATH]
 ```
 When type is unknown, just omit the type segment or use a dot .
 
