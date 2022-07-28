@@ -1,9 +1,9 @@
 # server.rb
 require 'socket'
+require 'yaml'
 require './app.rb'
  
 PORT = 5678
-HOST = "trinitron"
 
 puts " __ _ ___ _ __| |_  _ _ _____ ___  _ "
 puts "/ _` / _ \\ '_ \\ ' \\| '_/ _ \\ \\ / || |"
@@ -16,7 +16,7 @@ server = TCPServer.new PORT
 puts "Server started at port #{PORT}!"
 puts
 puts "navigate:"
-puts "http://#{HOST}:#{PORT}#{Application.GetProxyPath(GopherUrl.new("gopher://gopher.floodgap.com"))}"
+puts "http://localhost:#{PORT}#{Application.GetProxyPath(GopherUrl.new("gopher://gopher.floodgap.com"))}"
 
 loop do
 	Thread.new(server.accept) { |session|
@@ -45,17 +45,17 @@ loop do
 
 		method, full_path = rows[0].split(' ')
 
-		#begin
+		begin
 			status, headers, body = app.call({
 				'REQUEST_METHOD' => method,
 				'PATH_INFO' => full_path,
 				'CONTENT' => content
 			})
-			#rescue
-			#status = 500
-			#headers = {"content-type" => "text/plain"}
-			#body = ["Internal error!"]
-		#end
+			rescue
+			status = 500
+			headers = {"content-type" => "text/plain"}
+			body = ["Internal error!"]
+		end
 
 		session.print "HTTP/1.1 #{status}\r\n"
 		headers.each do |key, value|
