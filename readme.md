@@ -19,7 +19,7 @@ to open a gopher://* url with the proxy automatically, use the open.rb script:
 ```
 ruby ./open.rb gopher://gopher.floodgap.com
 ```
-It will make the URL the proxy-specific:
+It will make the URL proxy-specific:
 ``` 
 'http://localhost:5678/req/1/gopher.floodgap.com'
 ```
