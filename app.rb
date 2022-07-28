@@ -60,7 +60,7 @@ class Application
 	end
 
 	def redirectToDefaultPage()
-		gurl = GopherUrl.new("gopher://gopher.floodgap.com")
+		gurl = GopherUrl.new("gopher://gopher.floodgap.com") #need to use the servers config file??
 		return 307, {"Location" => Application.GetProxyPath(gurl)}, [""]
 	end
 
