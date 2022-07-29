@@ -26,6 +26,12 @@ class Application
 			return 404, {"content-type" => "text/plain"}, ["file not found!"]
 		end
 
+		#get /favicon.ico
+		if segments[0].start_with?("favicon") && method == "GET"
+			puts "KEKEKEKEKEKE"
+			return 307, {"Location" => "/static/icons/computer.png", "content-type" => "image/png"}, [""]
+		end
+
 		#get /req/./host.host.com/path/path/index.html?kek=lel
 		if segments[0] == 'req' && method == 'GET'
 			segments = segments[1..-1]
@@ -90,7 +96,6 @@ class GopherPageRender < Templ
 		end
 		yield "</div></body></html>"
  	end
-
 
 	def extractLines(chunk, last=false)
 		@unprocessed += chunk
@@ -176,29 +181,38 @@ class GopherUrl
 		@host, @port = hostAndPort.split(":",2)
 		@host = @host.strip()
 
-		@segments = []
 
+		@segments = []
+		@type = "."
+		
 		path = url.split("/",2)[1]
-		if path 
+		if path
 			@segments = path.split("/").select{|e| e.strip() != ""}
-			if segments.length > 0
-				@query = @segments[-1].split("?", 1)[1]
-				if @query
-					@segments[-1] = @segments[-1][0..@query.length-1]
+			if scheme == "gopher"
+				if path && @segments.length != 0
+					if @segments[0].length == 1
+						@type = @segments[0]
+						@segments = @segments[1..-1]
+					end
+				else
+					@type = "1"
 				end
 			end
-		end
 
-		@type = "."
-		if scheme == "gopher"
-			if path && @segments.length != 0
-				if @segments[0].length == 1
-					@type = @segments[0]
-					@segments = @segments[1..-1]
+			if segments.length > 0
+				if @segments[-1].include? "?"
+					@query = @segments[-1].split("?", 2)[1]
+					@segments[-1] = @segments[-1][0..@query.length-1]
+
+					if @type == "." || @type == nil
+						@type = "1"
+					end
 				end
 			else
 				@type = "1"
 			end
+		else
+			@type = "1"
 		end
 	end
 
@@ -207,7 +221,7 @@ class GopherUrl
 	end
 
 	def path(upto = -1)
-		"/#{@segments[0..upto].join("/")}"
+		@segments.length > 0 ? "/#{@segments[0..upto].join("/")}" : ""
 	end
 
 	def pathAndQuery
