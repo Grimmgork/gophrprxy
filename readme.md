@@ -1,6 +1,8 @@
 # A minimalistic, personal gopher:// proxy 📂
 Written in Ruby ...
 
+![looks](https://github.com/Grimmgork/gophrprxy/blob/main/preview.png?raw=true)
+
 Icons by https://win98icons.alexmeub.com/
 
 ## Setup:
