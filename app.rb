@@ -129,10 +129,6 @@ class GopherPageRender < Templ
 		return segments, urls
 	end
 
-	def query_segment
-		@req.url.query
-	end
-
 	def one_up
 		Application.GetProxyPath(GopherUrl.new(@req.url.one_up))
 	end
@@ -201,7 +197,7 @@ class GopherUrl
 			if segments.length > 0
 				if @segments[-1].include? "?"
 					@query = @segments[-1].split("?", 2)[1]
-					@segments[-1] = @segments[-1][0..@query.length-1]
+					@segments[-1] = @segments[-1][0..-@query.length-2]
 
 					if @type == "." || @type == nil
 						@type = "1"
@@ -224,7 +220,7 @@ class GopherUrl
 	end
 
 	def pathAndQuery
-		path + (query ? "?#{query}" : "")
+		path + (@query ? "?#{@query}" : "")
 	end
 
 	def host

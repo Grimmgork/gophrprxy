@@ -13,19 +13,28 @@
 	</p>
 	<p>👈 <a id="aup" href="<%=h(one_up)%>">..</a></p>
 
+	<script>
+		function OpenQuery(url){
+			let query = prompt("query?");
+			if(query === null){
+				return;
+			}
+			RunQuery(url, query)
+		}
+		function RunQuery(baseurl, query) {
+    			window.location.href = baseurl + "?" + query;
+		}
+	</script>
+
 	<% if @req.url.type == "7" %>
 	<div class="query-module">
     		<img src="/static/icons/gears.png" width="20" style="vertical-align: middle;" />
     		<input type="text" id="query-input" placeholder="query" />
-    		<button type="button" onclick="RunQuery(document.getElementById('query-input').value)">run</button>
+    		<button type="button" onclick="RunQuery(BASEURL, document.getElementById('query-input').value)">run</button>
 	</div>
 	<script>
-		//let person = prompt("query?", "Harry Potter");
-		query = "<%=@req.url.query%>"
-		baseurl = "<%=@req.url.without_query%>"
-		function RunQuery(query) {
-    			baseurl + "?" + query;
-		}
+		QUERY = "<%=@req.url.query%>"
+		BASEURL = "<%=@req.url.without_query%>"
 		document.getElementById('query-input').value = query
 	</script>
 	<% end %>
