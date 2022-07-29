@@ -3,10 +3,10 @@ require 'socket'
 require 'yaml'
 require './app.rb'
 
-config = YAML.load_file('config.yml')
+$config = YAML.load_file('config.yml')
 
-PORT = config["port"].to_i
-HOME = config["home"]
+PORT = $config["port"].to_i
+HOME = $config["home"]
 
 puts " __ _ ___ _ __| |_  _ _ _____ ___  _ "
 puts "/ _` / _ \\ '_ \\ ' \\| '_/ _ \\ \\ / || |"

@@ -60,17 +60,16 @@ class Application
 	end
 
 	def redirectToDefaultPage()
-		gurl = GopherUrl.new("gopher://gopher.floodgap.com") #need to use the servers config file??
+		gurl = GopherUrl.new($config["home"]) #need to use the servers config file??
 		return 307, {"Location" => Application.GetProxyPath(gurl)}, [""]
 	end
 
 	def self.GetProxyPath(gopherurl)
-		"/req/#{gopherurl.type}/#{gopherurl.host}#{gopherurl.path}"
+		"/req/#{gopherurl.type}/#{gopherurl.host_and_port}#{gopherurl.path}"
 	end
 end
 
 class GopherPageRender < Templ
-	#include Templ
 	TEMPLATENAME = "nav.rhtml"
 
 	def initialize(req)
@@ -79,7 +78,7 @@ class GopherPageRender < Templ
 	end
 
 	def each
-		yield "<!DOCTYPE html><html><head><link rel=\"stylesheet\" href=\"/static/style.css\" /></head><body>#{Render("nav.rhtml")}<div class='gopher-page'>"
+		yield "<!DOCTYPE html><html><head><title>#{@req.url.host_and_port}#{@req.url.pathAndQuery}</title><link rel=\"stylesheet\" href=\"/static/style.css\" /></head><body>#{Render("nav.rhtml")}<div class='gopher-page'>"
 		@req.each do |chunk|
 			extractLines(chunk).each do |row|
 				if row.strip() == "."
@@ -142,6 +141,10 @@ class GopherRequest
 
 	def initialize(url)
 		@url = url
+		@buffersize = $config["buffersize"].to_i
+		if @buffersize == nil || @buffersize < 1
+			@buffersize = 255
+		end
 	end
 
 	def each
@@ -149,7 +152,7 @@ class GopherRequest
 		s = TCPSocket.new @url.host, @url.port || 70
 		s.write "#{@url.pathAndQuery}\r\n"
 		loop do
-			chunk = s.read(255)
+			chunk = s.read(@buffersize)
 			if chunk == nil
 				break
 			end
@@ -268,7 +271,7 @@ class GopherElement
 			
 		@path = @path.strip()
 
-		if @path.start_with?("URL:")
+		if @path.start_with?("URL:") || @path.start_with?("URI:")
 			@url = @path[4..-1]
 			@type = "u"
 		else

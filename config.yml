@@ -1,3 +1,4 @@
 ---
 port: 5678
 home: gopher://gopher.floodgap.com
+buffersize: 255
