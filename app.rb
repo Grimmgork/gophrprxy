@@ -28,7 +28,6 @@ class Application
 
 		#get /favicon.ico
 		if segments[0].start_with?("favicon") && method == "GET"
-			puts "KEKEKEKEKEKE"
 			return 307, {"Location" => "/static/icons/computer.png", "content-type" => "image/png"}, [""]
 		end
 
