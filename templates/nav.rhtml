@@ -23,7 +23,7 @@
 		}
 
 		function ExecuteQuery(baseurl, query) {
-    			window.location.href = baseurl + "?" + query.replace("#", "%23");
+    			window.location.href = baseurl + "?" + query.replace(/#/g, "%23");
 		}
 	</script>
 </div>
