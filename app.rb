@@ -70,7 +70,7 @@ class Application
 	end
 
 	def self.GetProxyPath(gopherurl)
-		"/req/#{gopherurl.type}/#{gopherurl.host_and_port}#{gopherurl.path}"
+		"/req/#{gopherurl.type}/#{gopherurl.host_and_port}#{gopherurl.pathAndQuery}"
 	end
 end
 
@@ -198,6 +198,7 @@ class GopherUrl
 				if @segments[-1].include? "?"
 					@query = @segments[-1].split("?", 2)[1]
 					@segments[-1] = @segments[-1][0..-@query.length-2]
+					@query = @query.gsub("#", "%23")
 
 					if @type == "." || @type == nil
 						@type = "1"
@@ -327,8 +328,9 @@ class GopherElementRender < Templ
 		@element = element
 	end
 
-	def full_url
+	def full_proxy_url
 		url = "gopher://#{@element.host}:#{@element.port}/#{@element.type}/#{@element.path}"
-		Application.GetProxyPath(GopherUrl.new(url))
+		gurl = GopherUrl.new(url)
+		Application.GetProxyPath(gurl)
 	end
 end

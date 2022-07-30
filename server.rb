@@ -19,7 +19,7 @@ server = TCPServer.new PORT
 puts "Server started at port #{PORT}!"
 puts
 puts "home:"
-puts "http://localhost:#{PORT}#{Application.GetProxyPath(GopherUrl.new(HOME))}"
+puts "http://localhost:#{PORT}"
 
 loop do
 	Thread.new(server.accept) { |session|
