@@ -171,32 +171,33 @@ class GopherRequest
 	end
 end
 
-class GopherUrl 
+class GopherUrl
   	attr_writer :type
 	attr_writer :query
 
 	def initialize(url)
-		url = CGI::unescape(url)
+		#url = CGI::unescape(url)
 
 		@scheme, url = url.split("://")
+		@segments = url.split("/").select{|e| e.strip() != ""}
 
-		hostAndPort = url.split("/",2)[0]
+		@type = "."
+		if @segments.last.include? "?"
+			@query = @segments.last.split("?", 2)[1]
+			@segments[-1] = @segments.last[0..-@query.length-2]
+			@query = CGI::unescape(@query)
 
-		if hostAndPort.include? "?"
-			@query = hostAndPort.split("?", 2)[1]
-			hostAndPort = hostAndPort[0..-@query.length-2]
-			@query = @query.gsub("#", "%23")
+			if @type == "." || @type == nil
+				@type = "1"
+			end
 		end
 
-		@host, @port = hostAndPort.split(":",2)
+		@host, @port = @segments.first.split(":",2)
 		@host = @host.strip()
 
-		@segments = []
-		@type = "."
-		
-		path = url.split("/",2)[1]
-		if path
-			@segments = path.split("/").select{|e| e.strip() != ""}
+		@segments = @segments[1..-1]
+
+		if @segments.last
 			if scheme == "gopher"
 				if path && @segments.length != 0
 					if @segments[0].length == 1
@@ -206,20 +207,6 @@ class GopherUrl
 				else
 					@type = "1"
 				end
-			end
-
-			if segments.length > 0
-				if @segments[-1].include? "?"
-					@query = @segments[-1].split("?", 2)[1]
-					@segments[-1] = @segments[-1][0..-@query.length-2]
-					@query = @query.gsub("#", "%23")
-
-					if @type == "." || @type == nil
-						@type = "1"
-					end
-				end
-			else
-				@type = "1"
 			end
 		else
 			@type = "1"

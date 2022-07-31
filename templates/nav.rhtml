@@ -8,7 +8,10 @@
 	<p><img src="/static/icons/computer.png" width="18" style="vertical-align:middle;" />
 		<% segments, urls = url_segments %>
 		<% segments.each_with_index do |seg, index| %>
-			<a href="<%=h(urls[index])%>"><%=h(seg)%></a> /
+			<a href="<%=h(urls[index])%>"><%=h(seg)%></a>
+			<% if index < segments.length-1 %> 
+			/ 
+			<% end %>
 		<% end %>
 		<a href="javascript:QueryPrompt('<%=full_proxy_url_without_query%>')"><%="?" + h(url_query)%></a>
 	</p>
@@ -29,7 +32,7 @@
 		}
 
 		function ExecuteQuery(baseurl, query) {
-    			window.location.href = baseurl + "?" + query.replace(/#/g, "%23");
+    			window.location.href = baseurl + "?" + query.replace(/#/g, "%23").replace('/', "%2F");
 		}
 	</script>
 </div>
