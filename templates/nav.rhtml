@@ -15,7 +15,12 @@
 
 	<script>
 		function QueryPrompt(baseurl){
-			let query = prompt(baseurl + "?");
+			let msg = baseurl + "?"
+			if(msg.length > 80){
+				msg = "... " + msg.slice(80)
+			}
+
+			let query = prompt(msg);
 			if(query === null){
 				return;
 			}
