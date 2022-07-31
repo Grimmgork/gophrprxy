@@ -177,7 +177,6 @@ class GopherUrl
 
 	def initialize(url)
 		#url = CGI::unescape(url)
-
 		@scheme, url = url.split("://")
 		@segments = url.split("/").select{|e| e.strip() != ""}
 
