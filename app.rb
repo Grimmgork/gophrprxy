@@ -129,6 +129,14 @@ class GopherPageRender < Templ
 		return segments, urls
 	end
 
+	def url_query
+		@req.url.query
+	end
+
+	def full_proxy_url_without_query
+		Application.GetProxyPath(GopherUrl.new(@req.url.without_query))
+	end
+
 	def one_up
 		Application.GetProxyPath(GopherUrl.new(@req.url.one_up))
 	end
@@ -173,9 +181,15 @@ class GopherUrl
 		@scheme, url = url.split("://")
 
 		hostAndPort = url.split("/",2)[0]
+
+		if hostAndPort.include? "?"
+			@query = hostAndPort.split("?", 2)[1]
+			hostAndPort = hostAndPort[0..-@query.length-2]
+			@query = @query.gsub("#", "%23")
+		end
+
 		@host, @port = hostAndPort.split(":",2)
 		@host = @host.strip()
-
 
 		@segments = []
 		@type = "."

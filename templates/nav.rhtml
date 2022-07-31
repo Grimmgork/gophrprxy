@@ -10,6 +10,7 @@
 		<% segments.each_with_index do |seg, index| %>
 			<a href="<%=h(urls[index])%>"><%=h(seg)%></a> /
 		<% end %>
+		<a href="javascript:QueryPrompt('<%=full_proxy_url_without_query%>')"><%="?" + h(url_query)%></a>
 	</p>
 	<p>👈 <a id="aup" href="<%=h(one_up)%>">..</a></p>
 
