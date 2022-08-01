@@ -221,7 +221,7 @@ class GopherUrl
 	end
 
 	def pathAndQuery
-		path + (@query ? "?#{@query}" : "")
+		path + (@query && @query != "" ? "?#{@query}" : "")
 	end
 
 	def host
