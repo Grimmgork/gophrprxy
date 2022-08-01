@@ -328,6 +328,13 @@ class GopherElementRender < Templ
 		@element = element
 	end
 
+	def full_proxy_url_without_query
+		url = "gopher://#{@element.host}:#{@element.port}/#{@element.type}/#{@element.path}"
+		gurl = GopherUrl.new(url)
+		gurl.query = nil
+		Application.GetProxyPath(gurl)
+	end
+
 	def full_proxy_url
 		url = "gopher://#{@element.host}:#{@element.port}/#{@element.type}/#{@element.path}"
 		gurl = GopherUrl.new(url)

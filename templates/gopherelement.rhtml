@@ -8,7 +8,7 @@ when "i" %><img class='gopher-element-icon' src='/static/icons/blank.png'/><%=h(
 <% when "g" %><img class='gopher-element-icon' src='/static/icons/clip.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
 <% when "P" %><img class='gopher-element-icon' src='/static/icons/image.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
 <% when "u" %><img class='gopher-element-icon' src='/static/icons/globe.png'/><a href="<%=h(@element.url)%>"><%=h(@element.text)%></a>
-<% when "7" %><img class='gopher-element-icon' src='/static/icons/gears.png'/><a href="javascript:QueryPrompt('<%=h(full_proxy_url)%>')"><%=h(@element.text)%></a>
+<% when "7" %><img class='gopher-element-icon' src='/static/icons/gears.png'/><a href="javascript:QueryPrompt('<%=h(full_proxy_url_without_query)%>')"><%=h(@element.text)%></a>
 <% when "9" %><img class='gopher-element-icon' src='/static/icons/binary.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
 <% when "9" %><img class='gopher-element-icon' src='/static/icons/binary.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
 <% when "3" %><img class='gopher-element-icon' src='/static/icons/error.png'/><%=h(@element.text)%>
