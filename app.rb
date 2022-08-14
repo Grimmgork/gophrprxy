@@ -257,7 +257,7 @@ class GopherUrl
 	end
 
 	def without_query()
-		"#{scheme}://#{host_and_port}#{path}"
+		"#{scheme}://#{host_and_port}/#{type}#{path}"
 	end
 
 	def one_up()
