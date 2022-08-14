@@ -140,6 +140,10 @@ class GopherPageRender < Templ
 	def one_up
 		Application.GetProxyPath(GopherUrl.new(@req.url.one_up))
 	end
+
+	def home_url
+		Application.GetProxyPath(GopherUrl.new($config["home"]))
+	end
 end
 
 class GopherRequest

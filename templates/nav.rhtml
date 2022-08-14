@@ -3,6 +3,7 @@
 		p{
 			margin-top: 0px;
 			margin-bottom: 10px;
+			margin-right: 10px;
 		}
 	</style>
 	<p><img src="/static/icons/computer.png" width="18" style="vertical-align:middle;" />
@@ -14,9 +15,10 @@
 			<% end %>
 		<% end %>
 		<a href="javascript:QueryPrompt('<%=h(full_proxy_url_without_query)%>')"><%="?" + h(url_query)%></a>
+		<a style="float:right;" href="<%=h(home_url)%>">home</a>
 	</p>
 	<p>👈 <a id="aup" href="<%=h(one_up)%>">..</a></p>
-
+	
 	<script>
 		function QueryPrompt(baseurl){
 			let msg = baseurl + "?"
