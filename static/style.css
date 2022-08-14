@@ -64,9 +64,10 @@ div.navbar {
 	position: sticky;
 	top: 0;
 	color: whitesmoke;
-	background-color: rgb(18, 19, 20);
+	background-color: rgb(16, 16, 17);
 	line-height: 100%;
 	font-family: monospace;
+	box-shadow: 0 2px 15px 0 rgba(0,0,0,.6);
 }
     
 pre {

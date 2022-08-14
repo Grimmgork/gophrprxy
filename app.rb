@@ -142,7 +142,11 @@ class GopherPageRender < Templ
 	end
 
 	def home_url
-		Application.GetProxyPath(GopherUrl.new($config["home"]))
+		begin 
+			Application.GetProxyPath(GopherUrl.new($config["home"]))
+		rescue
+			nil
+		end
 	end
 end
 
@@ -181,7 +185,11 @@ class GopherUrl
 
 	def initialize(url)
 		#url = CGI::unescape(url)
-		@scheme, url = url.split("://")
+		begin
+			@scheme, url = url.split("://")
+		rescue
+			@scheme = "gopher"
+		end
 		@segments = url.split("/").select{|e| e.strip() != ""}
 
 		@type = "."
