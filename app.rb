@@ -118,7 +118,7 @@ class GopherPageRender < Templ
 		urls = []
 		gurl = GopherUrl.new("gopher://#{segments[0]}")
 
-		puts gurl.path
+		# puts gurl.path
 
 		urls.append Application.GetProxyPath(gurl)
 		segments[1..-1].each do |seg, index|
@@ -172,7 +172,7 @@ class GopherRequest
 			if chunk == nil
 				break
 			end
-			puts chunk
+			# puts chunk
 			yield chunk
 		end
 		s.close

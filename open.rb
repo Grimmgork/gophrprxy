@@ -1,4 +1,5 @@
 require 'yaml'
+require 'config.yml'
 require_relative './app.rb'
 
 url = ARGV[0] || "gopher://gopher.floodgap.com"

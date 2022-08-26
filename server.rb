@@ -16,10 +16,11 @@ puts
 
 server = TCPServer.new PORT
 
-puts "Server started at port #{PORT}!"
+puts "proxy running at port #{PORT}!"
 puts
 puts "home:"
 puts "http://localhost:#{PORT}"
+puts 
 
 loop do
 	Thread.new(server.accept) { |session|
@@ -40,13 +41,15 @@ loop do
 			rows.append(row)
 		end
 
-		puts rows
+		# puts rows
 
 		if contentLength != 0
 			content = session.read(contentLength)
 		end
 
 		method, full_path = rows[0].split(' ')
+
+		puts "#{method} #{full_path}"
 
 		# compute respnse
 		app = Application.new
@@ -56,10 +59,10 @@ loop do
 				'PATH_INFO' => full_path,
 				'CONTENT' => content
 			})
-			rescue => e
+		rescue StandartError => e
 			# error occured while computing the response
 			puts "====================="
-			puts "EXCEPTION: #{e.class}. Message: #{e.message}. Backtrace:  \n #{e.backtrace.join("\n")}"
+			puts "RESPONSE ERROR: #{method} #{full_path} + #{contentLength} (Content) \n Class: #{e.class}. Message: #{e.message}. Backtrace:  \n #{e.backtrace.join("\n")}"
 			puts "====================="
 			status = 500
 			headers = {"content-type" => "text/plain"}
@@ -68,10 +71,11 @@ loop do
 
 		# send headers
 		session.print "HTTP/1.1 #{status}\r\n"
+		headers["transfer-encoding"] = "chunked"
+
 		headers.each do |key, value|
 			session.print "#{key}: #{value}\r\n"
 		end
-		session.print "transfer-encoding: chunked\r\n"
 		session.print "\r\n"
 
 		# send body data (chunked-encoding)
