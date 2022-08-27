@@ -1,4 +1,4 @@
-# snappy, minimalistic, personal proxy to the gopherspace 🪐📂
+# snappy, minimalistic, proxy to the gopherspace 🪐📂
 *Written in Ruby ...*
 
 ![looks](https://github.com/Grimmgork/gophrprxy/blob/main/preview.png?raw=true)
