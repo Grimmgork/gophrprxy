@@ -7,6 +7,7 @@ $config = YAML.load_file('config.yml')
 
 PORT = $config["port"].to_i
 HOME = $config["home"]
+LOGG = $config["logging"].to_i
 
 puts " __ _ ___ _ __| |_  _ _ _____ ___  _ "
 puts "/ _` / _ \\ '_ \\ ' \\| '_/ _ \\ \\ / || |"
@@ -28,7 +29,7 @@ loop do
 		# extract http request data
 		contentLength = 0
 		rows = []
-		loop do 
+		loop do
 			row = session.gets
 			if row == "\r\n" || !row
 				break
@@ -49,37 +50,42 @@ loop do
 
 		method, full_path = rows[0].split(' ')
 
-		puts "#{method} #{full_path}"
+		if LOGG > 0
+			puts "#{method} #{full_path}"
+			if LOGG >= 1
+				puts rows
+			end
+		end
 
-		# compute respnse
+		# compute response
 		app = Application.new
 		begin
-			status, headers, body = app.call({
+			res_status, res_headers, res_body = app.call({
 				'REQUEST_METHOD' => method,
 				'PATH_INFO' => full_path,
 				'CONTENT' => content
 			})
-		rescue StandartError => e
+		rescue StandartError => e # currently does not catch SocketErrors??? idk y
 			# error occured while computing the response
 			puts "====================="
 			puts "RESPONSE ERROR: #{method} #{full_path} + #{contentLength} (Content) \n Class: #{e.class}. Message: #{e.message}. Backtrace:  \n #{e.backtrace.join("\n")}"
 			puts "====================="
-			status = 500
-			headers = {"content-type" => "text/plain"}
-			body = ["Internal error!"]
+			res_status = 500
+			res_headers = {"content-type" => "text/plain"}
+			res_body = ["Internal error!"]
 		end
 
 		# send headers
-		session.print "HTTP/1.1 #{status}\r\n"
-		headers["transfer-encoding"] = "chunked"
+		session.print "HTTP/1.1 #{res_status}\r\n"
+		res_headers["transfer-encoding"] = "chunked"
 
-		headers.each do |key, value|
+		res_headers.each do |key, value|
 			session.print "#{key}: #{value}\r\n"
 		end
 		session.print "\r\n"
 
 		# send body data (chunked-encoding)
-		body.each do |chunk|
+		res_body.each do |chunk|
 			if chunk
 				session.print "#{chunk.bytesize.to_s(16)}\r\n#{chunk}\r\n"
 			end

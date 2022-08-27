@@ -7,6 +7,7 @@
 		}
 	</style>
 	<p>
+		<a id="aup" href="<%=h(one_up)%>">..</a>
 		<img src="/static/icons/computer.png" width="15" style="vertical-align:middle;" />
 		<% segments, urls = url_segments %>
 		<% segments.each_with_index do |seg, index| %>
@@ -22,7 +23,6 @@
 			<a style="float:right;" href="<%=h(home_url)%>">home</a>
 		<% end %>
 	</p>
-	<p> <a id="aup" href="<%=h(one_up)%>">..</a></p>
 	
 	<script>
 		function QueryPrompt(baseurl){
