@@ -1,5 +1,5 @@
 ---
 port: 5678
-home: gopher://gopher.floodgap.com 
+home: gopher://gopher.floodgap.com
 buffersize: 255 # the size of the tcp buffer receiving data from the gopherspace
-logging: 1 # levels 0-2
+logging: 2 # log filter level: 0 = all

@@ -8,49 +8,59 @@ require_relative './mime.rb'
 
 class Application
 	def call(req)
-		segments = req["PATH_INFO"].split("/").select {|e| e != ".." && e != "" }
-		method = req["REQUEST_METHOD"]
-		content = req["CONTENT"]
 
-		if segments.length == 0
+		req_path = req["PATH_INFO"] || ""
+		req_segments = req_path.split("/").select {|e| e != ".." && e.strip != "" }
+		req_method = req["REQUEST_METHOD"]
+		#req_content = req["CONTENT"]
+
+		if req_segments.length == 0
 			return redirectToDefaultPage()
 		end
 
 		#get /static/*
-		if segments[0] == 'static' && method == 'GET'
-			headers = {"content-type" => MIME_EXT[File.extname(segments[-1])]}
-			fileName = "./#{segments.join("/")}"
+		if req_segments[0] == 'static' && req_method == 'GET'
+			headers = {"content-type" => MIME_EXT[File.extname(req_segments[-1])], "X-Content-Type-Options" => "nosniff", "Cache-Control" => "max-age=120"}
+			fileName = "./#{req_segments.join("/")}"
 			if File.file?(fileName)
 				return 200, headers, [ File.open(fileName, 'rb') { |io| io.read } ]
 			end
-			return 404, {"content-type" => "text/plain"}, ["file not found!"]
+			return ErrorMessage(404, "file not found!")
 		end
 
 		#get /favicon.ico
-		if segments[0].start_with?("favicon") && method == "GET"
+		if req_segments[0].start_with?("favicon") && req_method == "GET"
 			return 307, {"Location" => "/static/icons/computer.png", "content-type" => "image/png"}, [""]
 		end
 
 		#get /req/./host.host.com/path/path/index.html?kek=lel
-		if segments[0] == 'req' && method == 'GET'
-			segments = segments[1..-1]
+		if req_segments[0] == 'req' && req_method == 'GET'
+			req_segments = req_segments[1..-1]
 
-			if segments.length == 0
+			if req_segments.length == 0
 				return redirectToDefaultPage()
 			end
 
-			if segments[0].length == 1
-				type = segments[0]
-				segments = segments[1..-1]
+			if req_segments[0].length == 1
+				type = req_segments[0]
+				req_segments = req_segments[1..-1]
+			else
+				type = "."
 			end
 
-			if segments.length == 0
+			if req_segments.length == 0
 				return redirectToDefaultPage()
 			end
 
-			url = GopherUrl.new("gopher://#{segments.join("/")}")
+			url = GopherUrl.new("gopher://#{req_segments.join("/")}")
 			if type != nil
 				url.type = type
+			end
+
+			if url.type == "."
+				# start request
+				# get first chunk
+				# inspect for gopher like syntax (5 tabs and a newline?)
 			end
 
 			if url.type == "1" || url.type == "7"
@@ -61,12 +71,16 @@ class Application
 			return 200, {}, GopherRequest.new(url)
 		end
 
-		return 404, {"content-type" => "text/plain"}, ["service not found!"]
+		return ErrorMessage(404, "not found!")
 	end
 
 	def redirectToDefaultPage()
 		gurl = GopherUrl.new($config["home"]) #need to use the servers config file??
 		return 307, {"Location" => Application.GetProxyPath(gurl)}, [""]
+	end
+
+	def ErrorMessage(status, message)
+		return status, {"content-type" => "text/plain"}, ["ERROR: #{status} #{message}"]
 	end
 
 	def self.GetProxyPath(gopherurl)
@@ -164,7 +178,7 @@ class GopherRequest
 	end
 
 	def each
-		puts "TCPCALL: #{@url.to_s}"
+		# puts "TCPCALL: #{@url.to_s}"
 		s = TCPSocket.new @url.host, @url.port || 70
 		s.write "#{@url.pathAndQuery}\r\n"
 		loop do

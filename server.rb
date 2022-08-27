@@ -1,5 +1,6 @@
 # server.rb
 require 'socket'
+require 'timeout'
 require 'yaml'
 require './app.rb'
 
@@ -23,39 +24,45 @@ puts "home:"
 puts "http://localhost:#{PORT}"
 puts 
 
+def log(message, lvl=1)
+	if lvl >= LOGG
+		puts "~ #{Thread.current.object_id}: #{message}" 
+	end
+end
+
 loop do
 	Thread.new(server.accept) { |session|
+		tid = Thread.current.object_id
 
 		# extract http request data
-		contentLength = 0
-		rows = []
+		req_headers = []
 		loop do
-			row = session.gets
-			if row == "\r\n" || !row
+			row = session.gets.strip
+
+			if row == "" #empty row => done with headers, only content from here
 				break
 			end
 
-			row = row[0..-3]
-			if row.start_with?("Content-Length")
-				contentLength = row.split(" ")[1].to_i
-			end
-			rows.append(row)
+			req_headers.append(row)
 		end
 
-		# puts rows
+		log("Headers:\n #{req_headers.join("\n")}")
 
-		if contentLength != 0
-			content = session.read(contentLength)
+		# read the content, not needet for now (might not work at all, not tested)
+		#contentLength = req_headers.detect {|s| s.start_with "Content-Length"}.split(" ")[1].to_i
+		#if contentLength != 0
+		#	content = session.read(contentLength)
+		#end
+
+		begin
+			method, full_path = req_headers[0].split(' ')
+		rescue
+			log("ERR: INVALID REQ-HEADER", 3)
+			session.close
+			next
 		end
 
-		method, full_path = rows[0].split(' ')
-
-		if LOGG > 0
-			puts "#{method} #{full_path}"
-			if LOGG >= 1
-				puts rows
-			end
-		end
+		log("#{method} #{full_path}", 2)
 
 		# compute response
 		app = Application.new
@@ -63,16 +70,13 @@ loop do
 			res_status, res_headers, res_body = app.call({
 				'REQUEST_METHOD' => method,
 				'PATH_INFO' => full_path,
-				'CONTENT' => content
+				#'CONTENT' => content
 			})
-		rescue StandartError => e # currently does not catch SocketErrors??? idk y
+		rescue StandardError => e # currently does not catch SocketErrors??? idk y
 			# error occured while computing the response
-			puts "====================="
-			puts "RESPONSE ERROR: #{method} #{full_path} + #{contentLength} (Content) \n Class: #{e.class}. Message: #{e.message}. Backtrace:  \n #{e.backtrace.join("\n")}"
-			puts "====================="
-			res_status = 500
-			res_headers = {"content-type" => "text/plain"}
-			res_body = ["Internal error!"]
+
+			log("RESPONSE ERROR: #{method} #{full_path}\n Class: #{e.class}. Message: #{e.message}. Backtrace:  \n #{e.backtrace.join("\n")}", 3)
+			res_status, res_headers, res_body = app.ErrorMessage(500, "Internal server error! see the logs for more detail")
 		end
 
 		# send headers
