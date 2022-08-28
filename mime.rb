@@ -559,9 +559,3 @@ MIME_EXT = {
 	".z" => "application/x-compress",
 	".zip" => "application/x-zip-compressed"
 }
-MIME_GOPHER_TYPE = {
-	"0" => "text/plain",
-	"g" => "image/gif",
-	"p" => "image/png",
-	"I" => "image"
-}

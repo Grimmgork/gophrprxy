@@ -1,28 +1,23 @@
 <nav class="navbar">
-	<style>
-		p{
-			margin-top: 0px;
-			margin-bottom: 5px;
-			margin-right: 10px;
-		}
-	</style>
-	<p>
-		<a id="aup" href="<%=h(one_up)%>">..</a>
-		<img src="/static/icons/computer.png" width="15" style="vertical-align:middle;" />
-		<% segments, urls = url_segments %>
-		<% segments.each_with_index do |seg, index| %>
-			<a href="<%=h(urls[index])%>"><%=h(seg)%></a>
-			<% if index < segments.length-1 %> 
-			/ 
+	<div>
+		<p>
+			<a id="aup" href="<%=h(one_up)%>">..</a>
+			<img src="/static/icons/computer.png"/>
+			<% segments, urls = url_segments %>
+			<% segments.each_with_index do |seg, index| %>
+				<a href="<%=h(urls[index])%>"><%=h(seg)%></a>
+				<% if index < segments.length-1 %> 
+				/ 
+				<% end %>
 			<% end %>
-		<% end %>
-		<a href="javascript:QueryPrompt('<%=h(full_proxy_url_without_query)%>')"><%="?" + h(url_query)%></a>
-		<% if home_url == nil || home_url == "" %>
-			<a style="float:right;">home</a>
-		<% else %>
-			<a style="float:right;" href="<%=h(home_url)%>">home</a>
-		<% end %>
-	</p>
+			<a href="javascript:QueryPrompt('<%=h(full_proxy_url_without_query)%>')"><%="?" + h(url_query)%></a>
+			<% if home_url == nil || home_url == "" %>
+				<a style="float:right;">home</a>
+			<% else %>
+				<a style="float:right;" href="<%=h(home_url)%>">home</a>
+			<% end %>
+		</p>
+	</div>
 	
 	<script>
 		function QueryPrompt(baseurl){
