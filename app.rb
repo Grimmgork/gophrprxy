@@ -1,3 +1,4 @@
+# app.rb
 require 'cgi'
 require 'erb'
 
@@ -6,6 +7,12 @@ require './mime.rb'
 require './gopher.rb'
 
 class Application
+
+	def initialize(home, buffersize)
+		@home = home
+		@buffersize = buffersize
+	end
+
 	def call(req)
 
 		req_path = req["PATH_INFO"] || ""
@@ -64,17 +71,21 @@ class Application
 
 			if url.type == "1" || url.type == "7"
 				headers = { "content-type" => "text/html; charset=utf-8", "X-Content-Type-Options" => "nosniff" }
-				return 200, headers, GopherPageRender.new(GopherRequest.new(url))
+				return 200, headers, GopherPageRender.new(GopherRequest.new(url, @buffersize), @home)
 			end
 
-			return 200, {}, GopherRequest.new(url)
+			return 200, {}, GopherRequest.new(url, @buffersize)
 		end
 
 		return ErrorMessage(404, "not found!")
 	end
 
+	def home
+		@home
+	end
+
 	def redirectToDefaultPage()
-		gurl = GopherUrl.new($config["home"])
+		gurl = GopherUrl.new(@home)
 		return 307, {"Location" => Application.GetProxyPath(gurl)}, [""]
 	end
 
@@ -90,7 +101,8 @@ end
 class GopherPageRender < Templ
 	TEMPLATENAME = "nav.rhtml"
 
-	def initialize(req)
+	def initialize(req, home)
+		@home = home
 		@req = req
 		@unprocessed = ""
 	end
@@ -156,7 +168,7 @@ class GopherPageRender < Templ
 
 	def home_url
 		begin 
-			Application.GetProxyPath(GopherUrl.new($config["home"]))
+			Application.GetProxyPath(GopherUrl.new(@home))
 		rescue
 			nil
 		end

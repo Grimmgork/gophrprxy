@@ -18,7 +18,7 @@ body {
      background-color: var(--bg-dark)
 }
 
-nav.navbar {
+div.navbar {
 	padding: 10px;
 	position: sticky;
 	top: 0;
@@ -28,13 +28,13 @@ nav.navbar {
 	box-shadow: 0 2px 15px 0 rgba(0,0,0,.6);
 }
 
-nav.navbar p {
+div.navbar p {
 	margin-top: 0px;
 	margin-bottom: 5px;
 	margin-right: 0px;
 }
 
-nav.navbar img {
+div.navbar img {
 	height: 15px;
 	vertical-align: middle;
 }

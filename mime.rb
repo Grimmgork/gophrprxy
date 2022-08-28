@@ -1,3 +1,5 @@
+# mime.rb
+
 MIME_EXT = {
 	".323" => "text/h323",
 	".3g2" => "video/3gpp2",

@@ -1,3 +1,5 @@
+# tmpl.rb
+
 class Templ
 	include ERB::Util
 

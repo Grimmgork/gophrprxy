@@ -1,3 +1,4 @@
+# gopher.rb
 require 'socket'
 
 class GopherUrl
@@ -159,9 +160,9 @@ class GopherRequest
 		@url
 	end
 
-	def initialize(url)
+	def initialize(url, buffersize)
+		@buffersize = buffersize
 		@url = url
-		@buffersize = $config["buffersize"].to_i
 		if @buffersize == nil || @buffersize < 1
 			@buffersize = 255
 		end
@@ -172,7 +173,12 @@ class GopherRequest
 		s = TCPSocket.new @url.host, @url.port || 70
 		s.write "#{@url.pathAndQuery}\r\n"
 		loop do
-			chunk = s.read(@buffersize)
+			begin 
+				chunk = s.read(@buffersize)
+			rescue
+				puts "GOPHER REQUEST TCP CONN LOST"
+				break
+			end
 			if chunk == nil
 				break
 			end

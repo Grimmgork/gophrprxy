@@ -1,4 +1,4 @@
-<nav class="navbar">
+<div class="navbar">
 	<div>
 		<p>
 			<a id="aup" href="<%=h(one_up)%>">..</a>
@@ -6,7 +6,7 @@
 			<% segments, urls = url_segments %>
 			<% segments.each_with_index do |seg, index| %>
 				<a href="<%=h(urls[index])%>"><%=h(seg)%></a>
-				<% if index < segments.length-1 %> 
+				<% if index < segments.length-1 %>
 				/ 
 				<% end %>
 			<% end %>
@@ -37,4 +37,4 @@
     			window.location.href = baseurl + "?" + query.replace(/#/g, "%23").replace('/', "%2F");
 		}
 	</script>
-</nav>
+</div>
