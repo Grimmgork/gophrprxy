@@ -1,20 +1,30 @@
+:root {
+	--highlight: rgb(43, 50, 255);
+	--highlight-dark: rgba(0, 13, 255, 0.185);
+	--text: whitesmoke;
+	--error: #ff4444;
+	--bg: rgb(16, 16, 17);
+	--bg-dark: rgb(10, 10, 11);
+	
+	font-family: monospace;
+}
+
 body {
 	margin-top: 0px;
 	margin-bottom: 0px;
 	margin-left: 0px;
      margin-right: 0px;
 	padding-top: 0;
-     background-color: rgb(10, 10, 11);
+     background-color: var(--bg-dark)
 }
 
 nav.navbar {
 	padding: 10px;
 	position: sticky;
 	top: 0;
-	color: whitesmoke;
-	background-color: rgb(16, 16, 17);
+	color: var(--text);
+	background-color: var(--bg);
 	line-height: 100%;
-	font-family: monospace;
 	box-shadow: 0 2px 15px 0 rgba(0,0,0,.6);
 }
 
@@ -31,17 +41,17 @@ nav.navbar img {
 
 
 a:link {
-	color: rgb(43, 50, 255);
+	color: var(--highlight);
      background-color: transparent;
      text-decoration: none;
 }
 
 a:hover {
-	background-color: rgba(0, 13, 255, 0.185);
+	background-color: var(--highlight-dark);
 }
     
 a:visited {
-	color: rgb(43, 50, 255);
+	color: var(--highlight);
 	background-color: transparent;
 }
  
@@ -51,17 +61,16 @@ div.gopher-page {
 	margin-bottom: 15px;
 }
 
-
 .gopher-element {
 	font-family: monospace;
-	color: rgb(201, 201, 201);
+	color: var(--text);
 	margin: 0;
      padding: 0;
 	height: 18;
 }
 
 .gopher-element-error {
-	color: #ff4444;
+	color: var(--error);
 }
     
 .gopher-element img {

@@ -19,7 +19,7 @@ class Application
 
 		#get /static/*
 		if req_segments[0] == 'static' && req_method == 'GET'
-			headers = {"content-type" => MIME_EXT[File.extname(req_segments[-1])], "X-Content-Type-Options" => "nosniff"}
+			headers = {"content-type" => MIME_EXT[File.extname(req_segments[-1])], "X-Content-Type-Options" => "nosniff", "Cache-Control" => "max-age=120"}
 			fileName = "./#{req_segments.join("/")}"
 			if File.file?(fileName)
 				return 200, headers, [ File.open(fileName, 'rb') { |io| io.read } ]
