@@ -83,9 +83,7 @@ def serve(session)
 			'PATH_INFO' => full_path,
 			#'CONTENT' => content
 		})
-	rescue StandardError => e # currently does not catch SocketErrors??? idk y
-		# error occured while computing the response
-
+	rescue StandardError => e # error occured while computing the response
 		log("RESPONSE ERROR: #{method} #{full_path}\n Class: #{e.class}. Message: #{e.message}. Backtrace:  \n #{e.backtrace.join("\n")}", 3)
 		res_status, res_headers, res_body = app.ErrorMessage(500, "Internal server error! see the logs for more detail")
 	end
