@@ -7,7 +7,8 @@ class GopherUrl
 	attr_writer :query
 
 	def initialize(url)
-		#url = CGI::unescape(url)
+		url = CGI::unescape(url)
+
 		begin
 			@scheme, url = url.split("://")
 		rescue
@@ -19,7 +20,7 @@ class GopherUrl
 		if @segments.last.include? "?"
 			@query = @segments.last.split("?", 2)[1]
 			@segments[-1] = @segments.last[0..-@query.length-2]
-			@query = CGI::unescape(@query)
+			#@query = CGI::unescape(@query)
 
 			puts @query
 
