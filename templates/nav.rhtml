@@ -34,7 +34,10 @@
 		}
 
 		function ExecuteQuery(baseurl, query) {
-    			window.location.href = baseurl + "?" + query.replace(/#/g, "%23").replace('/', "%2F");
+			if(query == null || query == "")
+				return;
+			
+			window.location.href = baseurl + "?" + query.replace(/#/g, "%23").replace('/', "%2F");
 		}
 	</script>
 </div>
