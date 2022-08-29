@@ -125,7 +125,7 @@ class GopherPageRender < Templ
 					break
 				end
 				element = GopherElement.new(row)
-				yield GopherElementRender.new(element).Render("gopherelement.rhtml")
+				yield GopherElementRender.new(element, @req.url.host).Render("gopherelement.rhtml")
 			end
 		end
 		yield <<~EOS
@@ -192,8 +192,9 @@ end
 class GopherElementRender < Templ
 	TEMPLATENAME = "gopherelement.rhtml"
 
-	def initialize(element)
+	def initialize(element, page_host)
 		@element = element
+		@page_host = page_host
 	end
 
 	def full_proxy_url_without_query
