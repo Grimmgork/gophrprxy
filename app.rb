@@ -108,7 +108,17 @@ class GopherPageRender < Templ
 	end
 
 	def each
-		yield "<!DOCTYPE html><html><head><title>#{@req.url.host_and_port}#{@req.url.pathAndQuery}</title><link rel=\"stylesheet\" href=\"/static/style.css\" /></head><body>#{Render("nav.rhtml")}<div class='gopher-page'>"
+		yield <<~EOS 
+		<!DOCTYPE html>
+		<html>
+		<head>
+		<title>#{h(@req.url.host_and_port)}#{h(@req.url.pathAndQuery)}</title>
+		<link rel=\"stylesheet\" href=\"/static/style.css\" />
+		</head>
+		<body>
+		#{Render("nav.rhtml")}
+		<div class='gopher-page'>
+		EOS
 		@req.each do |chunk|
 			extractLines(chunk).each do |row|
 				if row.strip() == "."
@@ -118,7 +128,11 @@ class GopherPageRender < Templ
 				yield GopherElementRender.new(element).Render("gopherelement.rhtml")
 			end
 		end
-		yield "</div></body></html>"
+		yield <<~EOS
+		</div>
+		</body>
+		</html>
+		EOS
  	end
 
 	def extractLines(chunk, last=false)

@@ -1,5 +1,6 @@
 # gopher.rb
 require 'socket'
+require 'cgi'
 
 class GopherUrl
 	attr_writer :type
@@ -19,6 +20,8 @@ class GopherUrl
 			@query = @segments.last.split("?", 2)[1]
 			@segments[-1] = @segments.last[0..-@query.length-2]
 			@query = CGI::unescape(@query)
+
+			puts @query
 
 			if @type == "." || @type == nil
 				@type = "1"
