@@ -1,8 +1,8 @@
 <pre class='gopher-element'>
-<% case @element.type 
+<% case @element.type
 when "i" %><img src='/static/icons/blank.png'/><%=h(@element.text)%>
 <% when "0" %><img src='/static/icons/textfile.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% when "1" %><img src=<% if @page_host == @element.host %>'/static/icons/folder.png'<%else%>'/static/icons/remote_folder.png'<%end%>/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
+<% when "1" %><img src='/static/icons/folder.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
 <% when "h" %><img src='/static/icons/web.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
 <% when "I" %><img src='/static/icons/image.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
 <% when "g" %><img src='/static/icons/clip.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>

@@ -47,21 +47,24 @@ class Application
 				return redirectToDefaultPage()
 			end
 
+			type_parameter = nil
+			# extract type from path
 			if req_segments[0].length == 1
-				type = req_segments[0]
+				type_parameter = req_segments[0]
 				req_segments = req_segments[1..-1]
-			else
-				type = "."
 			end
 
+			# if a host was providet, there must be at least one segment left.
 			if req_segments.length == 0
 				return redirectToDefaultPage()
 			end
 
 			url = GopherUrl.new("gopher://#{req_segments.join("/")}")
-			if type != nil
-				url.type = type
+			if type_parameter != nil
+				url.type = type_parameter
 			end
+
+			puts url.type
 
 			if url.type == "." #sniff if the resource is a gopher page
 				# start request
@@ -195,6 +198,10 @@ class GopherElementRender < Templ
 	def initialize(element, page_host)
 		@element = element
 		@page_host = page_host
+	end
+
+	def is_foreign
+		@page_host != @element.host
 	end
 
 	def full_proxy_url_without_query
