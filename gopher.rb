@@ -48,9 +48,7 @@ class GopherUrl
 				end
 			end
 		else
-			puts "no type!"
 			@type = "1"
-			puts @type
 		end
 	end
 
