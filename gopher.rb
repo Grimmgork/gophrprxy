@@ -30,7 +30,7 @@ class GopherUrl
 		end
 
 		@segments.collect! { |e|
-			CGI::unescape(e).strip().replace("/", "%2F")
+			CGI::unescape(e).strip().gsub("/", "%2F")
 		}
 
 		# maybe clean up all segments with strip?

@@ -97,7 +97,7 @@ class Application
 	end
 
 	def self.GetProxyPath(gopherurl)
-		"/req/#{gopherurl.type}/#{gopherurl.host_and_port}#{gopherurl.pathAndQuery}"
+		"/req/#{gopherurl.type}/#{gopherurl.host_and_port}#{gopherurl.pathAndQuery.gsub("#", "%23")}"
 	end
 end
 
