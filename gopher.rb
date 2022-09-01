@@ -29,6 +29,10 @@ class GopherUrl
 			end
 		end
 
+		@segments.collect! { |e|
+			CGI::unescape(e).strip().replace("/", "%2F")
+		}
+
 		# maybe clean up all segments with strip?
 
 		@host, @port = @segments.first.split(":",2)
