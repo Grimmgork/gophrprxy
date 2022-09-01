@@ -54,17 +54,17 @@ class Application
 				req_segments = req_segments[1..-1]
 			end
 
-			# if a host was providet, there must be at least one segment left.
+			# if a host was provided, there must be at least one segment left.
+			# else the request is invalid and we redirect to home
 			if req_segments.length == 0
 				return redirectToDefaultPage()
 			end
 
 			url = GopherUrl.new("gopher://#{req_segments.join("/")}")
+			# if a type was providet in the url, we force it
 			if type_parameter != nil
 				url.type = type_parameter
 			end
-
-			puts url.type
 
 			if url.type == "." #sniff if the resource is a gopher page
 				# start request
