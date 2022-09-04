@@ -102,6 +102,7 @@ class Application
 end
 
 class GopherPageRender < Templ
+
 	TEMPLATENAME = "nav.rhtml"
 
 	def initialize(req, home)
@@ -119,7 +120,7 @@ class GopherPageRender < Templ
 		<link rel=\"stylesheet\" href=\"/static/style.css\" />
 		</head>
 		<body>
-		#{Render("nav.rhtml")}
+		#{Render()}
 		<div class='gopher-page'>
 		EOS
 		@req.each do |chunk|
@@ -128,7 +129,7 @@ class GopherPageRender < Templ
 					break
 				end
 				element = GopherElement.new(row)
-				yield GopherElementRender.new(element, @req.url.host).Render("gopherelement.rhtml")
+				yield GopherElementRender.new(element, @req.url.host).Render()
 			end
 		end
 		yield <<~EOS
@@ -193,6 +194,7 @@ class GopherPageRender < Templ
 end
 
 class GopherElementRender < Templ
+
 	TEMPLATENAME = "gopherelement.rhtml"
 
 	def initialize(element, page_host)
