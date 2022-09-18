@@ -55,37 +55,72 @@ a:visited {
 	color: var(--highlight);
 	background-color: transparent;
 }
- 
-div.gopher-page {
+
+
+pre.gopher-page {
 	margin-left: 15px;
 	margin-top: 15px;
 	margin-bottom: 15px;
 }
 
 .gopher-element {
-	font-family: monospace;
+	padding-inline: 15px;
 	color: var(--text);
-	margin: 0;
-     padding: 0;
-	height: 18;
+	display: inline;
 }
 
-.gopher-element-error {
+.ge-error {
 	color: var(--error);
-}
-    
-.gopher-element img {
-     vertical-align: middle;
-     object-fit: contain;
-     width: 15px;
-     height: 15px;
-     margin-right: 5px;
+	background:url(/static/icons/error.png) left no-repeat;
+	background-size: 12px;
 }
 
-.gopher-element pre {
-     padding: 0px;
-     margin-top: 0px;
-     margin-bottom: 0px;
-     padding-top: 0px;
-	padding-bottom: 0px;
+.ge-gopher {
+	background:url(/static/icons/folder.png) left no-repeat;
+	background-size: 12px;
+}
+
+.ge-text {
+	background:url(/static/icons/textfile.png) left no-repeat;
+	background-size: 12px;
+}
+
+.ge-image {
+	background:url(/static/icons/image.png) left no-repeat;
+	background-size: 12px;
+}
+
+.ge-html {
+	background:url(/static/icons/html.png) left no-repeat;
+	background-size: 12px;
+}
+
+.ge-gif {
+	background:url(/static/icons/clip.png) left no-repeat;
+	background-size: 12px;
+}
+
+.ge-url {
+	background:url(/static/icons/globe.png) left no-repeat;
+	background-size: 12px;
+}
+
+.ge-query {
+	background:url(/static/icons/gears.png) left no-repeat;
+	background-size: 12px;
+}
+
+.ge-binary {
+	background:url(/static/icons/binary.png) left no-repeat;
+	background-size: 12px;
+}
+
+.ge-doc {
+	background:url(/static/icons/document.png) left no-repeat;
+	background-size: 12px;
+}
+
+.ge-unknown {
+	background:url(/static/icons/questionmark.png) left no-repeat;
+	background-size: 12px;
 }

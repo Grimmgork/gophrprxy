@@ -1,17 +1,15 @@
-<pre class='gopher-element'>
 <% case @element.type
-when "i" %><img src='/static/icons/blank.png'/><%=h(@element.text)%>
-<% when "0" %><img src='/static/icons/textfile.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% when "1" %><img src='/static/icons/folder.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% when "h" %><img src='/static/icons/web.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% when "I" %><img src='/static/icons/image.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% when "g" %><img src='/static/icons/clip.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% when "P" %><img src='/static/icons/image.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% when "u" %><img src='/static/icons/globe.png'/><a href="<%=h(@element.url)%>"><%=h(@element.text)%></a>
-<% when "7" %><img src='/static/icons/gears.png'/><a href="javascript:QueryPrompt('<%=h(full_proxy_url_without_query)%>')"><%=h(@element.text)%></a>
-<% when "9" %><img src='/static/icons/binary.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% when "9" %><img src='/static/icons/binary.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% when "3" %><img src='/static/icons/error.png'/><%=h(@element.text)%>
-<% when "d" %><img src='/static/icons/document.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% else %><img src='/static/icons/questionmark.png'/><a href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
-<% end %></pre>
+when "i" %><tt class="gopher-element"><%=h(@element.text)%></tt>
+<% when "0" %><a class="gopher-element ge-text" href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
+<% when "1" %><a class="gopher-element ge-gopher" href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
+<% when "h" %><a class="gopher-element ge-html" href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
+<% when "I" %><a class="gopher-element ge-image" href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
+<% when "g" %><a class="gopher-element ge-gif" href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
+<% when "P" %><a class="gopher-element ge-image" href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
+<% when "u" %><a class="gopher-element ge-url" href="<%=h(@element.url)%>"><%=h(@element.text)%></a>
+<% when "7" %><a class="gopher-element ge-query" href="javascript:QueryPrompt('<%=h(full_proxy_url_without_query)%>')"><%=h(@element.text)%></a>
+<% when "9" %><a class="gopher-element ge-binary" href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
+<% when "3" %><tt class="gopher-element ge-error"><%=h(@element.text)%></tt>
+<% when "d" %><a class="gopher-element ge-doc" href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
+<% else %><a class="gopher-element ge-unknown" href="<%=h(full_proxy_url)%>"><%=h(@element.text)%></a>
+<% end %>

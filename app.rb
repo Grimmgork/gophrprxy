@@ -26,7 +26,7 @@ class Application
 
 		#get /static/*
 		if req_segments[0] == 'static' && req_method == 'GET'
-			headers = {"content-type" => MIME_EXT[File.extname(req_segments[-1])], "X-Content-Type-Options" => "nosniff", "Cache-Control" => "max-age=120"}
+			headers = {"content-type" => MIME_EXT[File.extname(req_segments[-1])], "X-Content-Type-Options" => "nosniff"}
 			fileName = "./#{req_segments.join("/")}"
 			if File.file?(fileName)
 				return 200, headers, [ File.open(fileName, 'rb') { |io| io.read } ]
@@ -44,7 +44,7 @@ class Application
 			req_segments = req_segments[1..-1]
 
 			if req_segments.length == 0
-				return redirectToDefaultPage()
+				return ErrorMessage(400, "bad request!")
 			end
 
 			type_parameter = nil
@@ -54,10 +54,10 @@ class Application
 				req_segments = req_segments[1..-1]
 			end
 
-			# if a host was provided, there must be at least one segment left.
+			# if a host is provided, there must be at least one segment left.
 			# else the request is invalid and we redirect to home
 			if req_segments.length == 0
-				return redirectToDefaultPage()
+				return ErrorMessage(413, "bad request!")
 			end
 
 			url = GopherUrl.new("gopher://#{req_segments.join("/")}")
@@ -72,12 +72,14 @@ class Application
 				# inspect for gopher like syntax (5 tabs and a newline?)
 			end
 
+			greq = GopherRequest.new(url, @buffersize)
+
 			if url.type == "1" || url.type == "7"
 				headers = { "content-type" => "text/html; charset=utf-8", "X-Content-Type-Options" => "nosniff" }
-				return 200, headers, GopherPageRender.new(GopherRequest.new(url, @buffersize), @home)
+				return 200, headers, GopherPageRender.new(greq, @home)
 			end
 
-			return 200, {}, GopherRequest.new(url, @buffersize)
+			return 200, {}, greq
 		end
 
 		return ErrorMessage(404, "not found!")
@@ -101,6 +103,17 @@ class Application
 	end
 end
 
+class FirstIterationSniffer
+
+	def initialize(itr)
+		@itr = itr
+	end
+
+	def each
+		
+	end
+end
+
 class GopherPageRender < Templ
 
 	TEMPLATENAME = "nav.rhtml"
@@ -121,7 +134,7 @@ class GopherPageRender < Templ
 		</head>
 		<body>
 		#{Render()}
-		<div class='gopher-page'>
+		<pre class='gopher-page'>
 		EOS
 		@req.each do |chunk|
 			extractLines(chunk).each do |row|
@@ -133,7 +146,7 @@ class GopherPageRender < Templ
 			end
 		end
 		yield <<~EOS
-		</div>
+		</pre>
 		</body>
 		</html>
 		EOS
