@@ -21,9 +21,11 @@ server = TCPServer.new PORT
 
 puts "proxy running at port #{PORT}!"
 puts
-puts "home:"
+puts "# HOME:"
 puts "http://localhost:#{PORT}"
 puts 
+puts "# URL-SCHEME:"
+puts "/[gophertype]/[host:port][/folder/file.txt]"
 
 def log(message, lvl=1)
 	if lvl >= LOGG
