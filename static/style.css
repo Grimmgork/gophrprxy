@@ -1,7 +1,7 @@
 :root {
 	--highlight: rgb(43, 50, 255);
 	--highlight-dark: rgba(0, 13, 255, 0.185);
-	--text: whitesmoke;
+	--text: rgb(208, 208, 208);
 	--error: #ff4444;
 	--foreign: #03ffd1;
 	--bg: rgb(16, 16, 17);
@@ -65,7 +65,7 @@ pre.gopher-page {
 
 .gopher-element {
 	padding-inline-start: 17px;
-	padding-inline-end: 5px;
+	padding-inline-end: 0px;
 	color: var(--text);
 	display: inline;
 }
