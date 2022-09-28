@@ -200,6 +200,10 @@ class GopherPageRender < Templ
 		return segments, urls
 	end
 
+	def full_url
+		@req.url.to_s(true)
+	end
+
 	def url_query
 		@req.url.query
 	end

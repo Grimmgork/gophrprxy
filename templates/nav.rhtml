@@ -21,6 +21,8 @@
 	</div>
 	
 	<script>
+		const GOPHER_URL = "<%=h(full_url)%>";
+
 		function QueryPrompt(baseurl){
 			let msg = baseurl + "?";
 			if(msg.length > 80) msg = "... " + msg.slice(80);
@@ -32,7 +34,7 @@
 		}
 
 		function TryGotoUrl() {
-			let url = prompt("enter gopher-url:");
+			let url = prompt(GOPHER_URL);
 			if(url === null) return;
 			
 			window.location.href = `/url?${encodeURIComponent(url).trim()}`;
