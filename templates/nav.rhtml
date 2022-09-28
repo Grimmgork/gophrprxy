@@ -1,6 +1,7 @@
 <div class="navbar">
 	<div>
 		<p>
+			<a href="javascript:TryGotoUrl()">url</a>
 			<a id="aup" href="<%=h(one_up)%>">..</a>
 			<img src="/static/icons/computer.png"/>
 			<% segments, urls = url_segments %>
@@ -21,22 +22,24 @@
 	
 	<script>
 		function QueryPrompt(baseurl){
-			let msg = baseurl + "?"
-			if(msg.length > 80){
-				msg = "... " + msg.slice(80)
-			}
+			let msg = baseurl + "?";
+			if(msg.length > 80) msg = "... " + msg.slice(80);
 
 			let query = prompt(msg);
-			if(query === null){
-				return;
-			}
-			ExecuteQuery(baseurl, query)
+			if(query === null) return;
+
+			ExecuteQuery(baseurl, query);
+		}
+
+		function TryGotoUrl() {
+			let url = prompt("enter gopher-url:");
+			if(url === null) return;
+			
+			window.location.href = `/url?${encodeURIComponent(url).trim()}`;
 		}
 
 		function ExecuteQuery(baseurl, query) {
-			if(query == null || query == "")
-				return;
-			
+			if(query == null || query == "") return;
 			window.location.href = baseurl + "?" + query.replace(/#/g, "%23").replace('/', "%2F");
 		}
 	</script>

@@ -24,6 +24,21 @@ class Application
 			return redirectToDefaultPage()
 		end
 
+		#get /url?url
+		if req_segments[0].split("?")[0] == 'url'
+			begin
+				url = CGI.unescape(req_segments[0].split("?")[1].strip)
+			rescue
+				return ErrorMessage(400, "Bad request!")
+			end
+
+			gurl = GopherUrl.new(url)
+			if gurl.scheme == "gopher"
+				return 307, {"Location" => Application.GetProxyPath(gurl)}, [""]
+			end
+			return ErrorMessage(400, "Invalid url!")
+		end
+
 		#get /static/*
 		if req_segments[0] == 'static' && req_method == 'GET'
 			headers = {"content-type" => MIME_EXT[File.extname(req_segments[-1])], "X-Content-Type-Options" => "nosniff"}

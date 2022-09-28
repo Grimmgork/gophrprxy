@@ -9,11 +9,14 @@ class GopherUrl
 	def initialize(url)
 		# url = CGI::unescape(url)
 
-		begin
-			@scheme, url = url.split("://")
-		rescue
+		a = url.split("://")
+		if a.length == 1
 			@scheme = "gopher"
+		else
+			@scheme = a[0]
 		end
+
+		url = a[1] || url
 		@segments = url.split("/").select{|e| e.strip() != ""}
 
 		@type = "."
