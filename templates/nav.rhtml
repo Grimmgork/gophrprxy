@@ -25,7 +25,7 @@
 		const GOPHER_URL = "<%=h(full_url)%>";
 
 		function QueryPrompt(baseurl){
-			let msg = baseurl + "?";
+			let msg = "query:";
 			if(msg.length > 80) msg = "... " + msg.slice(80);
 
 			let query = prompt(msg);
