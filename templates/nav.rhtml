@@ -35,7 +35,7 @@
 		}
 
 		function EnterUrl() {
-			let url = prompt(GOPHER_URL);
+			let url = prompt("Enter URL:");
 			if(url === null) return;
 			
 			window.location.href = `/url?${encodeURIComponent(url).trim()}`;
