@@ -21,3 +21,13 @@ Alternatively you can use the full-url interpreter:
 http://localhost:5678/url?[encoded url]
 ```
 Note that the url should ideally be fully url-encoded before passing it as a parameter!
+
+There is a helper script for generating the full proxy url called ```open-url.rb```:
+```
+ruby open-url.rb localhost 12345 "http://gopher.floodgap.com/0/gopher"
+outputs ->
+http://localhost:5678/url?http%3A%2F%2Fgopher.floodgap.com%2F0%2Fgopher
+redirects the browser to ->
+http://localhost:5678/req/0/gopher.floodgap.com:70/gopher
+```
+this can be used to automate redirection of normal gopher:// urls to the proxy
