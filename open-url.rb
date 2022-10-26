@@ -7,4 +7,4 @@ if host =~ /[ *~#"'&%]/
 end
 url = ARGV[2].strip
 
-`start http://#{host}:#{port}/url?#{CGI.escape(url)}`
+puts http://#{host}:#{port}/url?#{CGI.escape(url)}
