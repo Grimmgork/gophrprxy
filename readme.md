@@ -6,19 +6,18 @@
 Icons by https://win98icons.alexmeub.com/
 
 ## Setup:
-start the server:
+Start the server:
 ```
 ruby ./server.rb
 ```
-navigate like so:
+Navigate like so:
 ```
 http://localhost:5678/req/[GOPHERTYPE]/[HOST]:[PORT]/[PATH]
 ```
 When gophertype is unknown, just omit the type segment or use a dot .
 
-or use the full-url interpreter:
+Alternatively you can use the full-url interpreter:
 ```
 http://localhost:5678/url?[encoded url]
 ```
-Note that the url should ideally be fully url-encoded!
-
+Note that the url should ideally be fully url-encoded before passing it as a parameter!
