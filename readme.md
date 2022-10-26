@@ -14,7 +14,7 @@ Navigate like so:
 ```
 http://localhost:5678/req/[GOPHERTYPE]/[HOST]:[PORT]/[PATH]
 ```
-When gophertype is unknown, just omit the type segment or use a dot .
+When gophertype is unknown, just omit the type segment or use a ```.```
 
 Alternatively you can use the full-url interpreter:
 ```
