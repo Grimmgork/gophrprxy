@@ -3,7 +3,7 @@
 class Templ
 	include ERB::Util
 
-	def Render()
+	def render()
 		content = File.read("./templates/#{self.class::TEMPLATENAME}")
 		return ERB.new(content).result(binding)
 	end

@@ -2,7 +2,12 @@
 require 'socket'
 require 'timeout'
 require 'yaml'
+require 'pathname'
 require './app.rb'
+
+require './gopher.rb'
+
+require 'uri'
 
 config = YAML.load_file('config.yml')
 
@@ -27,11 +32,13 @@ puts
 puts "# URL-SCHEME:"
 puts "/[gophertype]/[host:port][/folder/file.txt]"
 
+
 def log(message, lvl=1)
 	if lvl >= LOGG
 		puts "~ #{Thread.current.object_id}: #{message}" 
 	end
 end
+
 
 # http server
 def serve(session)
@@ -87,7 +94,7 @@ def serve(session)
 		})
 	rescue StandardError => e # error occured while computing the response
 		log("RESPONSE ERROR: #{method} #{full_path}\n Class: #{e.class}. Message: #{e.message}. Backtrace:  \n #{e.backtrace.join("\n")}", 3)
-		res_status, res_headers, res_body = app.ErrorMessage(500, "Internal server error! see the logs for more detail")
+		res_status, res_headers, res_body = app.error_message(500, "Internal server error! see the logs for more detail")
 	end
 
 	# send headers

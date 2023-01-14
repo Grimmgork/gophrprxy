@@ -1,127 +1,124 @@
 :root {
-	--highlight: rgb(43, 50, 255);
-	--highlight-dark: rgba(0, 13, 255, 0.185);
-	--text: rgb(208, 208, 208);
-	--error: #ff4444;
-	--foreign: #03ffd1;
-	--bg: rgb(16, 16, 17);
-	--bg-dark: rgb(13, 13, 14);
-	
-	font-family: monospace;
+    --highlight: rgb(43, 50, 255);
+    --highlight-dark: rgba(0, 13, 255, 0.185);
+    --text: rgb(208, 208, 208);
+    --error: #ff4444;
+    --foreign: #03ffd1;
+    --bg: rgb(16, 16, 17);
+    --bg-dark: rgb(13, 13, 14);
+    font-family: monospace;
 }
 
 body {
-	margin-top: 0px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-     margin-right: 0px;
-	padding-top: 0;
-     background-color: var(--bg-dark)
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-top: 0;
+    background-color: var(--bg-dark)
 }
 
 div.navbar {
-	padding: 10px;
-	position: sticky;
-	top: 0;
-	color: var(--text);
-	background-color: var(--bg);
-	line-height: 100%;
-	box-shadow: 0 2px 10px 0 rgba(0,0,0,.6);
+    padding: 10px;
+    position: sticky;
+    top: 0;
+    color: var(--text);
+    background-color: var(--bg);
+    line-height: 100%;
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, .6);
 }
 
 div.navbar p {
-	margin-top: 0px;
-	margin-bottom: 5px;
-	margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    margin-right: 0px;
 }
 
 div.navbar img {
-	height: 15px;
-	vertical-align: middle;
+    height: 15px;
+    vertical-align: middle;
 }
 
-
 a:link {
-	color: var(--highlight);
-     background-color: transparent;
-     text-decoration: none;
+    color: var(--highlight);
+    background-color: transparent;
+    text-decoration: none;
 }
 
 a:hover {
-	background-color: var(--highlight-dark);
-}
-    
-a:visited {
-	color: var(--highlight);
-	background-color: transparent;
+    background-color: var(--highlight-dark);
 }
 
+a:visited {
+    color: var(--highlight);
+    background-color: transparent;
+}
 
 pre.gopher-page {
-	margin-left: 15px;
-	margin-top: 15px;
-	margin-bottom: 15px;
+    margin-left: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .gopher-element {
-	padding-inline-start: 17px;
-	padding-inline-end: 0px;
-	color: var(--text);
-	display: inline;
+    padding-inline-start: 17px;
+    padding-inline-end: 0px;
+    color: var(--text);
+    display: inline;
 }
 
 .ge-error {
-	color: var(--error);
-	background:url(/static/icons/error.png) left no-repeat;
-	background-size: 12px;
+    color: var(--error);
+    background: url(/static/icons/error.png) left no-repeat;
+    background-size: 12px;
 }
 
 .ge-gopher {
-	background:url(/static/icons/folder.png) left no-repeat;
-	background-size: 12px;
+    background: url(/static/icons/folder.png) left no-repeat;
+    background-size: 12px;
 }
 
 .ge-text {
-	background:url(/static/icons/textfile.png) left no-repeat;
-	background-size: 12px;
+    background: url(/static/icons/textfile.png) left no-repeat;
+    background-size: 12px;
 }
 
 .ge-image {
-	background:url(/static/icons/image.png) left no-repeat;
-	background-size: 12px;
+    background: url(/static/icons/image.png) left no-repeat;
+    background-size: 12px;
 }
 
 .ge-html {
-	background:url(/static/icons/html.png) left no-repeat;
-	background-size: 12px;
+    background: url(/static/icons/html.png) left no-repeat;
+    background-size: 12px;
 }
 
 .ge-gif {
-	background:url(/static/icons/clip.png) left no-repeat;
-	background-size: 12px;
+    background: url(/static/icons/clip.png) left no-repeat;
+    background-size: 12px;
 }
 
 .ge-url {
-	background:url(/static/icons/globe.png) left no-repeat;
-	background-size: 12px;
+    background: url(/static/icons/globe.png) left no-repeat;
+    background-size: 12px;
 }
 
 .ge-query {
-	background:url(/static/icons/gears.png) left no-repeat;
-	background-size: 12px;
+    background: url(/static/icons/gears.png) left no-repeat;
+    background-size: 12px;
 }
 
 .ge-binary {
-	background:url(/static/icons/binary.png) left no-repeat;
-	background-size: 12px;
+    background: url(/static/icons/binary.png) left no-repeat;
+    background-size: 12px;
 }
 
 .ge-doc {
-	background:url(/static/icons/document.png) left no-repeat;
-	background-size: 12px;
+    background: url(/static/icons/document.png) left no-repeat;
+    background-size: 12px;
 }
 
 .ge-unknown {
-	background:url(/static/icons/questionmark.png) left no-repeat;
-	background-size: 12px;
+    background: url(/static/icons/questionmark.png) left no-repeat;
+    background-size: 12px;
 }

@@ -1,10 +1,12 @@
 # app.rb
 require 'cgi'
 require 'erb'
+require 'pathname'
 
 require './templ.rb'
 require './mime.rb'
 require './gopher.rb'
+
 
 class Application
 
@@ -14,29 +16,35 @@ class Application
 	end
 
 	def call(req)
-
 		req_path = req["PATH_INFO"] || ""
 		req_segments = req_path.split("/").select {|e| e != ".." && e.strip != "" }
 		req_method = req["REQUEST_METHOD"]
 		#req_content = req["CONTENT"]
 
 		if req_segments.length == 0
-			return redirectToDefaultPage()
+			return res_redirect_default_page()
 		end
 
-		#get /url?url
+		#get /url?url=[encodedurl]&mod=[encodedpath]
 		if req_segments[0].split("?")[0] == 'url'
 			begin
-				url = CGI.unescape(req_segments[0].split("?")[1].strip)
+				params = CGI.parse(req_segments[0].split("?")[1].strip);
 			rescue
-				return ErrorMessage(400, "Bad request!")
+				return res_error_message(400, "Bad request!")
+			end
+
+			url = params["url"][0]
+			mod = params["mod"][0]
+
+			if not url
+				return res_error_message(400, "Bad request!")
 			end
 
 			gurl = GopherUrl.new(url)
 			if gurl.scheme == "gopher"
-				return 307, {"Location" => Application.GetProxyPath(gurl)}, [""]
+				return 307, {"Location" => Application.get_proxy_path(gurl)}, [""]
 			end
-			return ErrorMessage(400, "Invalid url!")
+			return res_error_message(400, "Invalid url!")
 		end
 
 		#get /static/*
@@ -46,7 +54,7 @@ class Application
 			if File.file?(fileName)
 				return 200, headers, [ File.open(fileName, 'rb') { |io| io.read } ]
 			end
-			return ErrorMessage(404, "file not found!")
+			return res_error_message(404, "file not found!")
 		end
 
 		#get /favicon.ico
@@ -59,7 +67,7 @@ class Application
 			req_segments = req_segments[1..-1]
 
 			if req_segments.length == 0
-				return ErrorMessage(400, "bad request!")
+				return res_error_message(400, "bad request!")
 			end
 
 			type_parameter = nil
@@ -72,10 +80,12 @@ class Application
 			# if a host is provided, there must be at least one segment left.
 			# else the request is invalid and we redirect to home
 			if req_segments.length == 0
-				return ErrorMessage(413, "bad request!")
+				return res_error_message(413, "bad request!")
 			end
 
 			url = GopherUrl.new("gopher://#{req_segments.join("/")}")
+			url.imply_empty_defaults()
+			
 			# if a type was providet in the url, we force it
 			if type_parameter != nil
 				url.type = type_parameter
@@ -97,41 +107,37 @@ class Application
 			return 200, {}, greq
 		end
 
-		return ErrorMessage(404, "not found!")
+		return res_error_message(404, "not found!")
 	end
 
-	def home
-		@home
-	end
-
-	def redirectToDefaultPage()
+	def res_redirect_default_page()
 		gurl = GopherUrl.new(@home)
-		return 307, {"Location" => Application.GetProxyPath(gurl)}, [""]
+		return 307, {"Location" => Application.get_proxy_path(gurl)}, [""]
 	end
 
-	def ErrorMessage(status, message)
+	def res_error_message(status, message)
 		return status, {"content-type" => "text/plain"}, ["ERROR: #{status} #{message}"]
 	end
 
-	def self.GetProxyPath(gopherurl)
-		"/req/#{gopherurl.type}/#{gopherurl.host_and_port}#{gopherurl.pathAndQuery.gsub("#", "%23")}"
+	def modify_url(url, mod)
+		path, query = mod.match /(?:\.\/)?([^?]*)(\?.*$)?/
+		if not path.start_with?("/")
+			# relative
+			path = url.segments.join("/") + path
+		end
+		path = Pathname.new(path).cleanpath
+		url.segments = path.split("/")
+		url.query = query
 	end
-end
 
-class FirstIterationSniffer
-
-	def initialize(itr)
-		@itr = itr
-	end
-
-	def each
-		
+	def self.get_proxy_path(gopherurl)
+		"/req/#{gopherurl.type || "."}/#{gopherurl.host_and_port}#{gopherurl.path_and_query.gsub("#", "%23")}"
 	end
 end
 
 class GopherPageRender < Templ
 
-	TEMPLATENAME = "nav.rhtml"
+	TEMPLATENAME = "navbar.rhtml"
 
 	def initialize(req, home)
 		@home = home
@@ -144,11 +150,11 @@ class GopherPageRender < Templ
 		<!DOCTYPE html>
 		<html>
 		<head>
-		<title>#{h(@req.url.host_and_port)}#{h(@req.url.pathAndQuery)}</title>
+		<title>#{h(@req.url.host_and_port)}#{h(@req.url.path_and_query)}</title>
 		<link rel=\"stylesheet\" href=\"/static/style.css\" />
 		</head>
 		<body>
-		#{Render()}
+		#{render()}
 		<pre class='gopher-page'>
 		EOS
 		@req.each do |chunk|
@@ -157,7 +163,7 @@ class GopherPageRender < Templ
 					break
 				end
 				element = GopherElement.new(row)
-				yield GopherElementRender.new(element, @req.url.host).Render()
+				yield GopherElementRender.new(element, @req.url.host).render()
 			end
 		end
 		yield <<~EOS
@@ -188,40 +194,34 @@ class GopherPageRender < Templ
 		
 		urls = []
 		gurl = GopherUrl.new("gopher://#{segments[0]}")
-
-		# puts gurl.path
-
-		urls.append Application.GetProxyPath(gurl)
+		gurl.type = "1"
+		urls.append Application.get_proxy_path(gurl)
 		segments[1..-1].each do |seg, index|
 			gurl.segments.append(seg)
-			urls.append Application.GetProxyPath(gurl)
+			urls.append Application.get_proxy_path(gurl)
 		end
 		
 		return segments, urls
 	end
 
-	def full_url
-		@req.url.to_s(true)
+	def url_full
+		@req.url.to_s()
 	end
 
 	def url_query
 		@req.url.query
 	end
 
-	def full_proxy_url_without_query
-		Application.GetProxyPath(GopherUrl.new(@req.url.without_query))
+	def url_without_query
+		@req.url.to_s("q")
 	end
 
-	def one_up
-		Application.GetProxyPath(GopherUrl.new(@req.url.one_up))
+	def one_up_url
+		Application.get_proxy_path(GopherUrl.new(@req.url.to_s("l-2")))
 	end
 
 	def home_url
-		begin 
-			Application.GetProxyPath(GopherUrl.new(@home))
-		rescue
-			nil
-		end
+		Application.get_proxy_path(GopherUrl.new(@home))
 	end
 end
 
@@ -242,12 +242,12 @@ class GopherElementRender < Templ
 		url = "gopher://#{@element.host}:#{@element.port}/#{@element.type}/#{@element.path}"
 		gurl = GopherUrl.new(url)
 		gurl.query = nil
-		Application.GetProxyPath(gurl)
+		Application.get_proxy_path(gurl)
 	end
 
 	def full_proxy_url
 		url = "gopher://#{@element.host}:#{@element.port}/#{@element.type}/#{@element.path}"
 		gurl = GopherUrl.new(url)
-		Application.GetProxyPath(gurl)
+		Application.get_proxy_path(gurl)
 	end
 end

@@ -1,0 +1,45 @@
+<div class="navbar">
+	<div>
+		<p>
+			<a href="javascript:UrlPrompt()" accesskey='u'>goto</a>
+			<a id="aup" href="<%=h(one_up_url)%>" accesskey='.'>..</a>
+			<img src="/static/icons/computer.png"/>
+			<% segments, urls = url_segments %>
+			<% segments.each_with_index do |seg, index| %>
+				<a href="<%=h(urls[index])%>"><%=h(seg)%></a>
+				<% if index < segments.length-1 %>
+				/
+				<% end %>
+			<% end %>
+			<a href="javascript:RunLocalQuery()" accesskey='q'><%="?" + h(url_query)%></a>
+			<% if home_url == nil || home_url == "" %>
+				<a style="float:right;">home</a>
+			<% else %>
+				<a style="float:right;" href="<%=h(home_url)%>">home</a>
+			<% end %>
+		</p>
+	</div>
+	
+	<script>
+		const QUERY = "<%=h(url_query)%>";
+		const URL = "<%=h(url_full)%>";
+
+		function RunQuery(baseurl){
+			let query = prompt(`query: ${baseurl}?`);
+			if(query === null) return;
+			window.location.href = `${baseurl}?${encodeURIComponent(query)}`;
+		}
+
+		function RunLocalQuery(){
+			let query = prompt("query:");
+			if(query === null) return;
+			window.location.href = `?${encodeURIComponent(query)}`;
+		}
+
+		function UrlPrompt() {
+			let url = prompt("goto:", URL);
+			if(url === null || url == "") return;
+			window.location.href = `/url?${encodeURIComponent(url).trim()}`;
+		}
+	</script>
+</div>
