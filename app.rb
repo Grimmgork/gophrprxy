@@ -133,6 +133,19 @@ class Application
 	end
 end
 
+class Templ
+	include ERB::Util
+
+	def render()
+		content = File.read("./templates/#{self.class::TEMPLATENAME}")
+		return ERB.new(content).result(binding)
+	end
+
+	def h(str)
+		html_escape str
+	end
+end
+
 class GopherPageRender < Templ
 
 	TEMPLATENAME = "navbar.rhtml"
@@ -247,18 +260,5 @@ class GopherElementRender < Templ
 		url = "gopher://#{@element.host}:#{@element.port}/#{@element.type}/#{@element.path}"
 		gurl = GopherUrl.new(url)
 		Application.get_proxy_path(gurl)
-	end
-end
-
-class Templ
-	include ERB::Util
-
-	def render()
-		content = File.read("./templates/#{self.class::TEMPLATENAME}")
-		return ERB.new(content).result(binding)
-	end
-
-	def h(str)
-		html_escape str
 	end
 end
